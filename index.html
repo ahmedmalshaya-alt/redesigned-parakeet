@@ -867,7 +867,7 @@
         // Scores are 0-100 rolling percentiles (~3y) computed by scripts/fetch_data.py; higher = more stress.
         { id: 'netLiquidity', pillar: 1, name: 'صافي السيولة (Fed − TGA − RRP) • تغيّر 4 أسابيع', weight: 0.14, systemic: true, freq: 'weekly' },
         { id: 'repoSofr', pillar: 1, name: 'فارق الريبو SOFR − IORB', weight: 0.12, systemic: true, freq: 'daily' },
-        { id: 'dxy', pillar: 1, name: 'الدولار الواسع (Broad USD) • تغيّر 3 أشهر', weight: 0.10, systemic: true, freq: 'weekly' },
+        { id: 'dxy', pillar: 1, name: 'مؤشر الدولار DXY • تغيّر 3 أشهر', weight: 0.10, systemic: true, freq: 'daily' },
         // Pillar 2: Credit & Yields
         { id: 'hygOas', pillar: 2, name: 'فوارق السندات عالية العائد (HY OAS)', weight: 0.16, systemic: true, freq: 'daily' },
         { id: 'yieldCurve', pillar: 2, name: 'منحنى العوائد 2s10s • سرعة التغيّر 20 يوماً', weight: 0.09, systemic: true, freq: 'daily' },
@@ -887,6 +887,8 @@
       // Data dates lag publication (FRED daily ~1 business day; weekly series up to ~9 days) -> limits include that lag.
       const STALE_MS = { live: 10 * 60 * 1000, daily: 6 * DAY_MS, weekly: 12 * DAY_MS };
       const DATA_REFRESH_MS = 30 * 60 * 1000;
+      // Paste the Cloudflare Worker URL here once (or open the page once with ?relay=<url>).
+      const DEFAULT_RELAY_URL = '';
       const OI_DEADZONE = 0.10; // |%| below this is treated as "no change" in the 4-quadrant read
       const REGIME_SEVERITY = { expansion: 0, valuationDip: 1, earlyStress: 2, crisis: 3 };
 
@@ -935,8 +937,8 @@
         seenObsKeys: new Set(),
         dataFeed: { ok: false, at: null },
         macroPrices: {
-          DXY: { price: 103.72, chg: 0.18 },
-          VIX: { price: 21.45, chg: 1.85 },
+          DXY: { price: 103.72, chg: null },   // daily % change shown only when a live quote provides it
+          VIX: { price: 21.45, chg: null },
           US10Y: { price: 4.28, chg: 0.04 }
         },
         oiAssets: [
@@ -1149,8 +1151,11 @@
         if (!badge || !dot || !txt) return;
         const gate = liveDataGate();
         let label, tone;
+        const liveOn = state.liveFeed && state.liveFeed.ok && Date.now() - state.liveFeed.at < LIVE_FRESH_MS;
         if (gate.valid) {
-          label = 'بيانات حقيقية • صالحة للقرار'; tone = 'emerald';
+          label = liveOn ? 'بث مباشر • بيانات حقيقية' : 'بيانات حقيقية • صالحة للقرار'; tone = 'emerald';
+        } else if (liveOn) {
+          label = `بث مباشر للأسعار • ${gate.simCount + gate.staleCount} مؤشرات نظامية غير محدّثة`; tone = 'amber';
         } else if (state.dataFeed && state.dataFeed.ok) {
           label = `data.json متصل • ${gate.simCount + gate.staleCount} مؤشرات نظامية غير محدّثة`; tone = 'amber';
         } else if (cryptoLive) {
@@ -1338,7 +1343,57 @@
         return true;
       }
 
-      window.OpsRoom = { ingestObservation, loadDataJson }; // exposed for testing
+      // -----------------------------------------------------------------------
+      // LIVE RELAY (Cloudflare Worker, relay/worker.js): market quotes every 20 s.
+      // Live quotes update prices, sectors and the VIX/DXY readings shown in gates.
+      // They never advance the 3/3 engine (that counts one real observation per trading day).
+      // -----------------------------------------------------------------------
+      const LIVE_RELAY_URL = (() => {
+        try {
+          const q = new URLSearchParams(location.search).get('relay');
+          if (q) { localStorage.setItem('ops_relay_url', q); return q; }
+          return localStorage.getItem('ops_relay_url') || DEFAULT_RELAY_URL;
+        } catch (_) { return DEFAULT_RELAY_URL; }
+      })().replace(/\/+$/, '');
+      const LIVE_POLL_MS = 20000;
+      const LIVE_FRESH_MS = 5 * 60 * 1000;
+
+      async function pollLive() {
+        if (!LIVE_RELAY_URL) return false;
+        try {
+          const res = await fetch(`${LIVE_RELAY_URL}/quotes`, { cache: 'no-store' });
+          if (!res.ok) throw new Error(res.status);
+          const d = await res.json();
+          applyLiveQuotes(d);
+          state.liveFeed = { ok: true, at: Date.now() };
+          return true;
+        } catch (_) {
+          state.liveFeed = { ok: false, at: state.liveFeed ? state.liveFeed.at : null };
+          return false;
+        }
+      }
+
+      function applyLiveQuotes(d) {
+        const q = d.quotes || {}, c = d.crypto || {};
+        state.oiAssets.forEach(a => {
+          const x = a.isCrypto ? c[a.id] : q[a.id];
+          if (!x || !Number.isFinite(Number(x.price))) return;
+          a.price = Number(x.price);
+          if (Number.isFinite(Number(x.chgPct))) a.chg = Number(x.chgPct);
+          a.src = 'live-price';
+          a.liveAt = Date.now();
+          a.liveDelay = x.delayedMin || 0;
+        });
+        state.sectors.forEach(s => {
+          const x = q[s.code];
+          if (x && Number.isFinite(Number(x.chgPct))) { s.perf = Number(x.chgPct); s.live = true; s.liveAt = Date.now(); }
+        });
+        state.liveQuotes = { at: Date.now(), VIX: q.VIX || null, DXY: q.DXY || null };
+        if (q.VIX && Number.isFinite(Number(q.VIX.chgPct))) state.macroPrices.VIX.chg = Number(q.VIX.chgPct);
+        if (q.DXY && Number.isFinite(Number(q.DXY.chgPct))) state.macroPrices.DXY.chg = Number(q.DXY.chgPct);
+      }
+
+      window.OpsRoom = { ingestObservation, loadDataJson, applyLiveQuotes }; // exposed for testing
 
       function computeMetrics() {
         let weightedSum = 0;
@@ -1392,8 +1447,8 @@
           { sym: 'GOLD', val: `$${gc.price.toFixed(1)}`, chg: gc.chg, live: gc.src === 'live-price' },
           { sym: 'OIL', val: `$${cl.price.toFixed(2)}`, chg: cl.chg, live: cl.src === 'live-price' },
           { sym: 'S&P500', val: `${es.price.toFixed(1)}`, chg: es.chg, live: es.src === 'live-price' },
-          { sym: 'DXY', val: `${raw.dxy.toFixed(2)}`, chg: state.macroPrices.DXY.chg, live: raw.isLive },
-          { sym: 'VIX', val: `${raw.vix.toFixed(2)}`, chg: state.macroPrices.VIX.chg, live: raw.isLive }
+          { sym: 'DXY', val: `${raw.dxy.toFixed(2)}`, chg: raw.dxyLive ? state.macroPrices.DXY.chg : null, live: raw.isLive || raw.dxyLive },
+          { sym: 'VIX', val: `${raw.vix.toFixed(2)}`, chg: raw.vixLive ? state.macroPrices.VIX.chg : null, live: raw.isLive || raw.vixLive }
         ];
 
         container.innerHTML = items.map(it => {
@@ -1401,7 +1456,7 @@
           return `<div class="inline-flex items-center gap-1.5 ${it.live ? '' : 'opacity-60'}">
             <span class="font-black text-slate-300">${it.sym}</span>
             <span class="font-bold text-white tabular-nums">${it.val}</span>
-            <span class="font-extrabold tabular-nums ${cls}">${fmtPct(it.chg)}</span>
+            <span class="font-extrabold tabular-nums ${cls}">${it.chg === null || it.chg === undefined ? '' : fmtPct(it.chg)}</span>
             ${it.live ? '' : '<span class="text-[9px] font-black text-slate-500">SIM</span>'}
           </div>`;
         }).join('<span class="text-slate-700">|</span>');
@@ -1421,7 +1476,7 @@
           hygOas: Number((2.85 + v.hygOas * 0.055).toFixed(2)),
           sofrBp: Number((-2.4 + v.repoSofr * 0.34).toFixed(1)),
           vix: Number((12.0 + v.vix * 0.32).toFixed(2)),
-          dxy: Number((112 + v.dxy * 0.2).toFixed(2)),   // broad USD index scale (illustrative)
+          dxy: Number((96 + v.dxy * 0.12).toFixed(2)),   // DXY scale (illustrative)
           dxyPct: Math.round(v.dxy),
           curveBps: Math.round(-38 + v.yieldCurve * 1.1),
           rspSpyChg: Number((3 - v.breadth * 0.08).toFixed(2)),
@@ -1429,7 +1484,14 @@
           realYield: Number((0.2 + v.realYield * 0.03).toFixed(2)),
           isLive: false
         };
-        return useLive ? { ...derived, ...state.live.raw, isLive: true } : derived;
+        if (state.mode !== 'live') return derived;
+        const out = useLive ? { ...derived, ...state.live.raw, isLive: true } : derived;
+        const lq = state.liveQuotes;
+        if (lq && Date.now() - lq.at < LIVE_FRESH_MS) {   // real intraday quotes override (display + live gate status)
+          if (lq.VIX && Number.isFinite(Number(lq.VIX.price))) { out.vix = Number(lq.VIX.price); out.vixLive = true; }
+          if (lq.DXY && Number.isFinite(Number(lq.DXY.price))) { out.dxy = Number(lq.DXY.price); out.dxyLive = true; }
+        }
+        return out;
       }
 
       function evaluateBankingGates() {
@@ -1949,7 +2011,7 @@
             <td class="py-2.5 px-2 font-extrabold tabular-nums ${oiCls}">${fmtPct(a.oiChg)}</td>
             <td class="py-2.5 px-2"><span class="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold border ${reg.cls}">${reg.label}</span></td>
             <td class="py-2.5 px-2 whitespace-nowrap text-[10px] text-slate-500">${a.src === 'live-price'
-              ? `${provBadge('live')} ${a.feedSource || 'متصفح'}${a.feedDate ? ' • ' + a.feedDate : ''}<br>OI: ${a.oiLive ? provBadge('live') + ' ' + (a.oiSource || '') : provBadge('sim')}`
+              ? `${provBadge('live')} ${a.liveAt && Date.now() - a.liveAt < LIVE_FRESH_MS ? 'مباشر' + (a.liveDelay ? ` (تأخير ${a.liveDelay}د)` : '') : (a.feedSource || 'متصفح') + (a.feedDate ? ' • ' + a.feedDate : '')}<br>OI: ${a.oiLive ? provBadge('live') + ' ' + (a.oiSource || '') : provBadge('sim')}`
               : provBadge('sim')}</td>
           </tr>`;
         }).join('');
@@ -2146,8 +2208,8 @@
 
         const liqStr = `${netLiqB >= 0 ? '+' : ''}${netLiqB} مليار دولار خلال 4 أسابيع`;
         setPart(2, 'قراءة المؤشرات القيادية (السيولة، السندات، الدولار، والتقلب)',
-          `تُظهر قراءة صافي السيولة (الفيدرالي − TGA − RRP) تغيراً بحدود <strong class="tabular-nums text-white">${liqStr}</strong> ${tNetLiq.html}، بينما تقف فوارق السندات عالية العائد (HY OAS) عند <strong class="tabular-nums text-white">${hygOasNum.toFixed(2)}%</strong> ${tHyg.html}، والدولار الواسع عند <strong class="tabular-nums text-white">${dxyNum.toFixed(2)}</strong> (المئين ${Math.round(sv.dxy)}) ${tDxy.html}، ومؤشر الخوف (VIX) عند <strong class="tabular-nums text-white">${vixNum.toFixed(2)}</strong> ${tVix.html}.`,
-          `تُظهر قراءة صافي السيولة (الفيدرالي − TGA − RRP) تغيراً بحدود ${liqStr} ${tNetLiq.plain}، بينما تقف فوارق السندات عالية العائد (HY OAS) عند ${hygOasNum.toFixed(2)}% ${tHyg.plain}، والدولار الواسع عند ${dxyNum.toFixed(2)} (المئين ${Math.round(sv.dxy)}) ${tDxy.plain}، ومؤشر الخوف (VIX) عند ${vixNum.toFixed(2)} ${tVix.plain}.`
+          `تُظهر قراءة صافي السيولة (الفيدرالي − TGA − RRP) تغيراً بحدود <strong class="tabular-nums text-white">${liqStr}</strong> ${tNetLiq.html}، بينما تقف فوارق السندات عالية العائد (HY OAS) عند <strong class="tabular-nums text-white">${hygOasNum.toFixed(2)}%</strong> ${tHyg.html}، ومؤشر الدولار DXY عند <strong class="tabular-nums text-white">${dxyNum.toFixed(2)}</strong> (المئين ${Math.round(sv.dxy)}) ${tDxy.html}، ومؤشر الخوف (VIX) عند <strong class="tabular-nums text-white">${vixNum.toFixed(2)}</strong> ${tVix.html}.`,
+          `تُظهر قراءة صافي السيولة (الفيدرالي − TGA − RRP) تغيراً بحدود ${liqStr} ${tNetLiq.plain}، بينما تقف فوارق السندات عالية العائد (HY OAS) عند ${hygOasNum.toFixed(2)}% ${tHyg.plain}، ومؤشر الدولار DXY عند ${dxyNum.toFixed(2)} (المئين ${Math.round(sv.dxy)}) ${tDxy.plain}، ومؤشر الخوف (VIX) عند ${vixNum.toFixed(2)} ${tVix.plain}.`
         );
 
         const sofrStr = `${sofrBp >= 0 ? '+' : ''}${sofrBp} نقطة أساس`;
@@ -2202,7 +2264,7 @@
           : decision.code === 'invalid'
           ? `${decision.title} — لا إجابة على سؤال "قاع أم فخ؟" قبل توفر بيانات حقيقية.`
           : `${decision.title} — الإجابة: ${decision.code === 'crisis' || decision.code === 'earlyStress' ? 'احتمال فخ هبوطي مرتفع (الأولوية لحماية الكاش).' : 'بيئة مناسبة للتجميع المنضبط دون أزمة ائتمان.'}`;
-        const c2 = `ضغط السيولة والائتمان ${m.systemicStress}% ${tSys.plain} | HY OAS عند ${hygOasNum.toFixed(2)}% | الدولار الواسع ${dxyNum.toFixed(2)} | العائد الحقيقي ${realY.toFixed(2)}%.`;
+        const c2 = `ضغط السيولة والائتمان ${m.systemicStress}% ${tSys.plain} | HY OAS عند ${hygOasNum.toFixed(2)}% | DXY ${dxyNum.toFixed(2)} | العائد الحقيقي ${realY.toFixed(2)}%.`;
         const c3 = `${decision.oiHealthTitle} — الذهب OI ${fmtPct(gc.oiChg)} | النفط OI ${fmtPct(cl.oiChg)} | BTC OI ${fmtPct(btc.oiChg)}.`;
         const c4 = `نسبة الكاش المستهدفة ${decision.cashPct} | التحوط: ${decision.hedgeTitle} | السندات: ${decision.permBonds.text}.`;
 
@@ -2610,6 +2672,14 @@
         setInterval(async () => {      // data.json is refreshed by GitHub Actions twice a day
           if (await loadDataJson(false)) renderAll();
         }, DATA_REFRESH_MS);
+        if (LIVE_RELAY_URL) {
+          if (await pollLive()) { setConnStatus(state.feedSource, true); renderAll(); }
+          setInterval(async () => {
+            await pollLive();
+            setConnStatus(state.feedSource, true);
+            renderAll();
+          }, LIVE_POLL_MS);
+        }
       });
     })();
   </script>

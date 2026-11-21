@@ -225,10 +225,15 @@ def ind_repo():
 
 
 def ind_dollar():
-    s = fred("DTWEXBGS")
+    # Real DXY (ICE) from Yahoo -> same-day value; FRED broad dollar (published weekly) only as fallback
+    try:
+        s, src, freq = yahoo("DX-Y.NYB"), "Yahoo (DXY)", "daily"
+    except Exception as e:  # noqa: BLE001
+        log_err("yahoo DXY (using FRED DTWEXBGS)", e)
+        s, src, freq = fred("DTWEXBGS"), "FRED (Broad USD)", "weekly"
     ch = pchg(s, 63)  # ~3-month % change
     sc = score([v for _, v in ch], WIN_D)
-    put("dxy", sc, s[-1][0], "FRED", "weekly", len(ch[-WIN_D:]))  # published weekly with daily values
+    put("dxy", sc, s[-1][0], src, freq, len(ch[-WIN_D:]))
     raw["dxy"] = round(s[-1][1], 2)
     raw["dxyPct"] = sc
 
@@ -253,14 +258,24 @@ def ind_real_yield():
 
 
 def ind_vix():
-    s = fred("VIXCLS")
-    put("vix", score([v for _, v in s], WIN_D), s[-1][0], "FRED", "daily", len(s[-WIN_D:]))
+    try:
+        s, src = yahoo("^VIX"), "Yahoo"
+    except Exception as e:  # noqa: BLE001
+        log_err("yahoo VIX (using FRED VIXCLS)", e)
+        s, src = fred("VIXCLS"), "FRED"
+    put("vix", score([v for _, v in s], WIN_D), s[-1][0], src, "daily", len(s[-WIN_D:]))
     raw["vix"] = round(s[-1][1], 2)
 
 
 def ind_skew():
-    s = [x for x in cboe_skew() if x[0] >= START]
-    put("skewPcr", score([v for _, v in s], WIN_D), s[-1][0], "CBOE", "daily", len(s[-WIN_D:]))
+    try:
+        s, src = yahoo("^SKEW"), "Yahoo"
+        if len(s) < 300:
+            raise RuntimeError("short ^SKEW history")
+    except Exception as e:  # noqa: BLE001
+        log_err("yahoo SKEW (using CBOE csv)", e)
+        s, src = [x for x in cboe_skew() if x[0] >= START], "CBOE"
+    put("skewPcr", score([v for _, v in s], WIN_D), s[-1][0], src, "daily", len(s[-WIN_D:]))
     raw["skew"] = round(s[-1][1], 1)
 
 

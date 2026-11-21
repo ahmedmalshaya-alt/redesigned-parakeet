@@ -40,7 +40,7 @@ OOS_START = "2023-01-01"
 
 # calendar days after the observation date before a value is considered public
 LAGS = {"WALCL": 1, "WTREGEN": 1, "RRPONTSYD": 0, "SOFR": 1, "IORB": 0, "IOER": 0, "DTWEXBGS": 7,
-        "BAMLH0A0HYM2": 1, "T10Y2Y": 0, "DFII10": 0, "VIXCLS": 0, "SKEW": 0, "BREADTH": 0}
+        "BAMLH0A0HYM2": 1, "DXY": 0, "T10Y2Y": 0, "DFII10": 0, "VIXCLS": 0, "SKEW": 0, "BREADTH": 0}
 
 WEIGHTS = {"netLiquidity": .14, "repoSofr": .12, "dxy": .10, "hygOas": .16, "yieldCurve": .09, "realYield": .09,
            "vix": .10, "breadth": .08, "skewPcr": .06}  # crossAsset (BTC OI) has no long history -> renormalised
@@ -161,9 +161,9 @@ def assert_daily(name, series, min_rows):
 def build_panel():
     F = {sid: fred(sid) for sid in ["WALCL", "WTREGEN", "RRPONTSYD", "SOFR", "IORB", "IOER", "DTWEXBGS",
                                     "BAMLH0A0HYM2", "T10Y2Y", "DFII10", "VIXCLS", "DTB3"]}
-    spy, gold, rsp = yahoo("SPY"), yahoo("GC=F"), yahoo("RSP")
+    spy, gold, rsp, dxy = yahoo("SPY"), yahoo("GC=F"), yahoo("RSP"), yahoo("DX-Y.NYB")
     skew = cboe_skew()
-    assert_daily("SPY", spy, 5000); assert_daily("GC=F", gold, 4000); assert_daily("RSP", rsp, 4000)
+    assert_daily("SPY", spy, 5000); assert_daily("GC=F", gold, 4000); assert_daily("RSP", rsp, 4000); assert_daily("DXY", dxy, 5000)
     assert_daily("SKEW", skew, 5000); assert_daily("VIXCLS", F["VIXCLS"], 5000)
 
     # --- indicator series (native frequency), then lag to availability date
@@ -181,7 +181,7 @@ def build_panel():
         if ref is not None:
             spread.append((d, (v - ref) * 100))
 
-    dx = F["DTWEXBGS"]; dx_ch = [(dx[i][0], (dx[i][1] / dx[i - 63][1] - 1) * 100) for i in range(63, len(dx))]
+    dx = dxy; dx_ch = [(dx[i][0], (dx[i][1] / dx[i - 63][1] - 1) * 100) for i in range(63, len(dx))]
     cv = F["T10Y2Y"]; cv_sp = [(cv[i][0], abs(cv[i][1] - cv[i - 20][1]) * 100) for i in range(20, len(cv))]
     rspd = dict(rsp); ratio = [(d, rspd[d] / v) for d, v in spy if d in rspd and v]
     br = [(ratio[i][0], (ratio[i][1] / ratio[i - 50][1] - 1) * 100) for i in range(50, len(ratio))]
@@ -189,7 +189,7 @@ def build_panel():
     scores = {
         "netLiquidity": lagged(rolling_pct(net_ch, WIN_W, invert=True), LAGS["WALCL"]),
         "repoSofr": lagged(rolling_pct(spread, WIN_D), LAGS["SOFR"]),
-        "dxy": lagged(rolling_pct(dx_ch, WIN_D), LAGS["DTWEXBGS"]),
+        "dxy": lagged(rolling_pct(dx_ch, WIN_D), LAGS["DXY"]),
         "hygOas": lagged(rolling_pct(F["BAMLH0A0HYM2"], WIN_D), LAGS["BAMLH0A0HYM2"]),
         "yieldCurve": lagged(rolling_pct(cv_sp, WIN_D), LAGS["T10Y2Y"]),
         "realYield": lagged(rolling_pct(F["DFII10"], WIN_D), LAGS["DFII10"]),
