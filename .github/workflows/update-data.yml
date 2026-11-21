@@ -5,6 +5,11 @@ on:
     # 13:17 and 22:17 UTC (16:17 and 01:17 Bahrain) — after US data releases and after the US close
     - cron: "17 13,22 * * *"
   workflow_dispatch: {}   # "Run workflow" button for a manual refresh
+  push:                   # also refresh right after the fetch script changes (no manual click needed)
+    branches: [main]
+    paths:
+      - "scripts/**"
+      - ".github/workflows/update-data.yml"
 
 permissions:
   contents: write         # lets the bot commit data.json (no repo setting change needed)

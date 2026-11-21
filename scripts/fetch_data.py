@@ -111,13 +111,34 @@ def fred(sid):
     return [(o["date"], float(o["value"])) for o in js["observations"] if o["value"] not in (".", "")]
 
 
-def stooq(sym):
-    txt = http(f"https://stooq.com/q/d/l/?s={sym}&i=d")
-    rows = list(csv.DictReader(io.StringIO(txt)))
-    out = [(r["Date"], float(r["Close"])) for r in rows if r.get("Close") not in (None, "", "N/D")]
-    if len(out) < 3:
-        raise RuntimeError(f"stooq {sym}: no data ({txt[:60]!r})")
-    return out
+def yahoo(sym, rng="5y"):
+    """Yahoo Finance chart API (unofficial, free, no key). Dates in the exchange's local calendar."""
+    last = None
+    for host in ("query1", "query2"):
+        try:
+            url = f"https://{host}.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(sym)}?range={rng}&interval=1d"
+            r = json.loads(http(url, retries=1))["chart"]["result"][0]
+            off = int(r["meta"].get("gmtoffset", 0))
+            closes = r["indicators"]["quote"][0]["close"]
+            out = [(dt.datetime.fromtimestamp(t + off, dt.timezone.utc).strftime("%Y-%m-%d"), float(c))
+                   for t, c in zip(r["timestamp"], closes) if c is not None]
+            if len(out) < 3:
+                raise RuntimeError(f"yahoo {sym}: too few rows")
+            return out
+        except Exception as e:  # noqa: BLE001
+            last = e
+    raise last
+
+
+def prices(yahoo_sym, fred_id=None):
+    """Daily closes: Yahoo first, FRED fallback where an equivalent series exists."""
+    try:
+        return yahoo(yahoo_sym), "Yahoo"
+    except Exception as e:  # noqa: BLE001
+        if not fred_id:
+            raise
+        log_err(f"yahoo {yahoo_sym} (using FRED {fred_id})", e)
+        return fred(fred_id), "FRED"
 
 
 def cboe_skew():
@@ -183,7 +204,7 @@ def ind_net_liquidity():
         t, r = asof(tga, d), asof(rrp, d)
         if t is None or r is None:
             continue
-        net.append((d, w / 1000.0 - t - r))  # WALCL millions -> billions; TGA, RRP billions
+        net.append((d, w / 1000.0 - t / 1000.0 - r))  # WALCL & WTREGEN in millions -> billions; RRP already billions
     if not net or not (1000 < net[-1][1] < 15000):
         raise RuntimeError(f"net liquidity sanity check failed: {net[-1] if net else None}")
     ch = diff(net, 4)  # 4-week change, billions
@@ -240,10 +261,10 @@ def ind_skew():
 
 
 def ind_breadth():
-    rsp, spy = dict(stooq("rsp.us")), stooq("spy.us")
+    rsp, spy = dict(yahoo("RSP")), yahoo("SPY")
     ratio = [(d, rsp[d] / v) for d, v in spy if d in rsp and v]
     ch = pchg(ratio, 50)  # equal-weight vs cap-weight, 50-day % change
-    put("breadth", score([v for _, v in ch], WIN_D, invert=True), ch[-1][0], "Stooq", "daily", len(ch[-WIN_D:]))
+    put("breadth", score([v for _, v in ch], WIN_D, invert=True), ch[-1][0], "Yahoo", "daily", len(ch[-WIN_D:]))
     raw["rspSpyChg"] = round(ch[-1][1], 2)
 
 
@@ -261,9 +282,40 @@ def btc_oi_daily():
                    float(x["sumOpenInterest"])) for x in js), "Binance"
 
 
+def okx_btc_oi_daily():
+    js = json.loads(http("https://www.okx.com/api/v5/rubik/stat/contracts/open-interest-volume?ccy=BTC&period=1D"))
+    rows = js.get("data") or []
+    out = sorted((dt.datetime.fromtimestamp(int(r[0]) / 1000, dt.timezone.utc).strftime("%Y-%m-%d"), float(r[1]))
+                 for r in rows)
+    if len(out) < 20:
+        raise RuntimeError("OKX OI: too few rows")
+    return out
+
+
+def own_btc_oi_daily():
+    """Daily series built from our own stored snapshots (last snapshot per day), any single source."""
+    snaps = PREV.get("oiHistory", {}).get("BTC", [])
+    by_src = {}
+    for ts, oi, src in snaps:
+        by_src.setdefault(src, {})[dt.datetime.fromtimestamp(ts / 1000, dt.timezone.utc).strftime("%Y-%m-%d")] = oi
+    if not by_src:
+        raise RuntimeError("no stored OI snapshots yet")
+    src, days = max(by_src.items(), key=lambda kv: len(kv[1]))
+    out = sorted(days.items())
+    if len(out) < 14:
+        raise RuntimeError(f"own OI history too short ({len(out)}/14 days) — builds up automatically")
+    return out, f"{src} (سجل ذاتي)"
+
+
 def ind_cross_asset():
-    s, src = btc_oi_daily()
-    put("crossAsset", score([v for _, v in s], 90), s[-1][0], src, "daily", len(s[-90:]))
+    for name, fn in (("bybit/binance", btc_oi_daily), ("okx", lambda: (okx_btc_oi_daily(), "OKX")), ("own", own_btc_oi_daily)):
+        try:
+            s, src = fn()
+            put("crossAsset", score([v for _, v in s], 90), s[-1][0], src, "daily", len(s[-90:]))
+            return
+        except Exception as e:  # noqa: BLE001
+            log_err(f"crossAsset via {name}", e)
+    raise RuntimeError("all BTC OI sources failed")
 
 
 INDICATOR_JOBS = [
@@ -280,10 +332,10 @@ INDICATOR_JOBS = [
 ]
 
 # ------------------------------------------------------------------ assets & sectors
-FUT = {  # id: (stooq symbol, CFTC legacy code)
-    "GC": ("gc.f", "088691"), "SI": ("si.f", "084691"), "CL": ("cl.f", "067651"),
-    "HG": ("hg.f", "085692"), "ES": ("es.f", "13874A"), "NQ": ("nq.f", "209742"),
-    "ZN": ("zn.f", "043602"),
+FUT = {  # id: (Yahoo symbol, FRED fallback or None, CFTC legacy code)
+    "GC": ("GC=F", None, "088691"), "SI": ("SI=F", None, "084691"), "CL": ("CL=F", "DCOILWTICO", "067651"),
+    "HG": ("HG=F", None, "085692"), "ES": ("ES=F", "SP500", "13874A"), "NQ": ("NQ=F", "NASDAQ100", "209742"),
+    "ZN": ("ZN=F", None, "043602"),
 }
 SECTORS = ["XLK", "XLF", "XLV", "XLE", "XLY", "XLP", "XLI", "XLU", "XLB", "XLRE", "XLC"]
 
@@ -336,11 +388,11 @@ def build_assets():
             hist[a] = [s for s in hist[a] if NOW_MS - s[0] <= 10 * 24 * 3600 * 1000]
     except Exception as e:  # noqa: BLE001
         log_err("crypto snapshot", e)
-    for a, (sym, code) in FUT.items():
+    for a, (sym, fred_id, code) in FUT.items():
         try:
-            px = stooq(sym)
+            px, src = prices(sym, fred_id)
             item = {"price": round(px[-1][1], 4), "chg": round((px[-1][1] / px[-2][1] - 1) * 100, 2),
-                    "date": px[-1][0], "ts": date_ms(px[-1][0]), "source": "Stooq", "oiChg": None}
+                    "date": px[-1][0], "ts": date_ms(px[-1][0]), "source": src, "oiChg": None}
             try:
                 c = cot(code)
                 if len(c) >= 2 and c[1][1]:
@@ -350,7 +402,7 @@ def build_assets():
                 log_err(f"cot {a}", e)
             assets[a] = item
         except Exception as e:  # noqa: BLE001
-            log_err(f"stooq {a}", e)
+            log_err(f"price {a}", e)
             if a in PREV.get("assets", {}):
                 assets[a] = dict(PREV["assets"][a], kept=True)
     return assets, hist
@@ -360,7 +412,7 @@ def build_sectors():
     out = {}
     for s in SECTORS:
         try:
-            px = stooq(s.lower() + ".us")
+            px = yahoo(s, rng="1mo")
             out[s] = {"perf": round((px[-1][1] / px[-2][1] - 1) * 100, 2), "date": px[-1][0]}
         except Exception as e:  # noqa: BLE001
             log_err(f"sector {s}", e)
