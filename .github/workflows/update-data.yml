@@ -16,7 +16,7 @@ permissions:
   contents: write         # lets the bot commit data.json (no repo setting change needed)
 
 concurrency:
-  group: update-data
+  group: repo-writer
   cancel-in-progress: false
 
 jobs:
@@ -44,5 +44,6 @@ jobs:
             echo "No change in data.json"
           else
             git commit -m "data: update $(date -u +%Y-%m-%d_%H%M)Z"
+            git pull --rebase origin main
             git push
           fi
