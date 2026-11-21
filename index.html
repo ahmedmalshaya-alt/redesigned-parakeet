@@ -1,0 +1,2482 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>غرفة العمليات المؤسسية: رادار السيولة والعقود المفتوحة واتخاذ القرار</title>
+
+  <!-- Arabic Font: Cairo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Cairo', 'sans-serif']
+          },
+          colors: {
+            terminal: {
+              bg: '#090d16',
+              panel: '#0f172a',
+              card: '#111827',
+              border: '#1e293b'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --bg-main: #090d16;
+      --bg-panel: #0f172a;
+      --border-main: #1e293b;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: #f1f5f9;
+      font-family: 'Cairo', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090d16;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    /* Range Slider Styling */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 9999px;
+      background: #1e293b;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #38bdf8;
+      border: 2px solid #090d16;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+    }
+
+    /* Inline Semantic Explanation Badges inside Report Paragraphs */
+    .inline-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.08rem 0.5rem;
+      margin: 0 0.2rem;
+      border-radius: 9999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      line-height: 1.45;
+      vertical-align: baseline;
+      white-space: nowrap;
+    }
+    .tag-pos {
+      background-color: rgba(16, 185, 129, 0.16);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.38);
+    }
+    .tag-neu {
+      background-color: rgba(245, 158, 11, 0.16);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.38);
+    }
+    .tag-neg {
+      background-color: rgba(239, 68, 68, 0.18);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.42);
+    }
+
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
+
+  <!-- ======================================================================= -->
+  <!-- 1. TOP LIVE TICKER BAR & ZERO-HANG CONNECTION ENGINE                    -->
+  <!-- ======================================================================= -->
+  <header class="sticky top-0 z-40 bg-[#090d16]/95 backdrop-blur-md border-b border-slate-800 shadow-lg shadow-black/40">
+    <!-- Ticker Strip -->
+    <div class="border-b border-slate-800/80 bg-[#0c1220]">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 flex items-center justify-between gap-3 overflow-x-auto">
+        <div id="liveTickerItems" class="flex items-center gap-4 text-xs whitespace-nowrap">
+          <!-- Populated dynamically -->
+        </div>
+        <div class="flex items-center gap-2 shrink-0 text-[11px] text-slate-400">
+          <span id="lastUpdateClock" class="tabular-nums font-bold text-slate-300">--:--:--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Control Bar -->
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+      <!-- Brand & Connection Pill -->
+      <div class="flex flex-wrap items-center justify-between lg:justify-start gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 shrink-0">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-sm sm:text-base font-black text-white leading-tight">غرفة العمليات المؤسسية</h1>
+            <p class="text-[11px] text-cyan-400 font-semibold">رادار السيولة والعقود المفتوحة واتخاذ القرار</p>
+          </div>
+        </div>
+
+        <!-- Connection Status Badge -->
+        <div id="connBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/35">
+          <span id="connDot" class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span id="connText">جاري الفحص • بيانات محاكاة</span>
+        </div>
+      </div>
+
+      <!-- Controls: Reconnect, Interval, Email Settings -->
+      <div class="flex flex-wrap items-center gap-2 no-print">
+        <button type="button" id="reconnectBtn" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors cursor-pointer">
+          إعادة فحص الاتصال
+        </button>
+
+        <select id="intervalSelect" class="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-200 border border-slate-700 outline-none cursor-pointer">
+          <option value="15000" selected>فحص المصادر كل 15 ثانية</option>
+          <option value="60000">فحص المصادر كل دقيقة</option>
+          <option value="0">إيقاف مؤقت</option>
+        </select>
+
+        <button type="button" id="openAlertSettingsBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 transition-colors cursor-pointer">
+          <span>إعدادات الإيميل والتنبيهات</span>
+          <span id="headerAlertCount" class="px-1.5 py-0.5 rounded-full text-[10px] bg-rose-500/25 text-rose-300 font-black tabular-nums">0</span>
+        </button>
+
+        <label class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-slate-800/90 text-slate-200 border border-slate-700 cursor-pointer select-none">
+          <input type="checkbox" id="autoPopupToggle" checked class="accent-cyan-500 w-3.5 h-3.5 cursor-pointer" />
+          <span>تأكيد Popup تلقائي</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Scenario Presets Strip -->
+    <div class="border-t border-slate-800/80 bg-[#0b111e] no-print">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 flex flex-wrap items-center gap-2">
+        <span class="text-[11px] font-bold text-slate-400 ml-1">السيناريوهات:</span>
+        <button type="button" data-scenario="live" class="scenario-btn px-3 py-1 rounded-lg text-xs font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 cursor-pointer">الوضع المباشر (Live)</button>
+        <button type="button" data-scenario="expansion" class="scenario-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer">استقرار وتوسع</button>
+        <button type="button" data-scenario="valuationDip" class="scenario-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer">تصحيح تقييمات (فرصة)</button>
+        <button type="button" data-scenario="earlyStress" class="scenario-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer">ضغط سيولة مبكر</button>
+        <button type="button" data-scenario="crisis" class="scenario-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer">أزمة سيولة وائتمان</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================= -->
+  <!-- MAIN CONTAINER                                                          -->
+  <!-- ======================================================================= -->
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 py-6 space-y-6">
+
+    <!-- ===================================================================== -->
+    <!-- 2. EXECUTIVE DECISION CENTER (مركز اتخاذ القرار القيادي)              -->
+    <!-- ===================================================================== -->
+    <section class="bg-[#0f172a] border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl shadow-black/40 space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800 pb-3">
+        <div>
+          <span class="text-xs font-bold text-cyan-400">لوحة القيادة المركزية</span>
+          <h2 class="text-lg sm:text-xl font-black text-white">مركز اتخاذ القرار القيادي ومؤشر الإنذار المبكر</h2>
+        </div>
+        <span id="activeModeTag" class="self-start sm:self-auto px-3 py-1 rounded-full text-xs font-extrabold bg-cyan-500/15 text-cyan-300 border border-cyan-500/35">
+          وضع مباشر • تحديث مستمر
+        </span>
+      </div>
+
+      <!-- Data Provenance Gate Bar -->
+      <div id="dataGateBar" class="hidden rounded-xl px-4 py-3 border text-xs sm:text-sm font-extrabold"></div>
+
+      <!-- Executive Verdict Banner -->
+      <div id="cmdVerdictBanner" class="rounded-2xl p-4 sm:p-5 border transition-all duration-300 bg-amber-500/10 border-amber-500/35 space-y-3">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div class="space-y-1.5 flex-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-bold text-cyan-400">الحكم التنفيذي الفوري: هل هذا قاع قابل للشراء أم فخ هبوطي؟</span>
+              <span id="confirmBufferBadge" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/15 text-emerald-300 border border-emerald-500/35">
+                بانتظار قراءات حقيقية
+              </span>
+              <span id="bankingGatesBadge" class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-900/80 text-slate-300 border border-slate-700 tabular-nums">
+                بوابات الأزمة المصرفية: 0/4
+              </span>
+            </div>
+
+            <h3 id="cmdVerdictTitle" class="text-lg sm:text-xl font-black text-amber-300">
+              فرصة تجميع تدريجي (تصحيح تقييمات بدون أزمة ائتمان)
+            </h3>
+
+            <!-- Direct Cause Single-Line Callout -->
+            <div id="directCauseCallout" class="flex flex-wrap items-center justify-between gap-2 bg-[#090d16]/90 border border-slate-800 rounded-xl px-3 py-2 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 shrink-0"></span>
+                <span id="directCauseText" class="font-bold text-slate-200">سبب الحكم المؤكد: الائتمان والتمويل المصرفي ضمن الحدود المنضبطة (0/4 بوابات أزمة مخترقة).</span>
+              </div>
+              <span id="lastAckStamp" class="text-[11px] text-slate-400 tabular-nums"></span>
+            </div>
+
+            <p id="cmdVerdictDesc" class="text-xs sm:text-sm text-slate-300 leading-relaxed pt-0.5">
+              تظهر المؤشرات تراجعاً في التقييمات دون تصدع في الائتمان أو التمويل المصرفي، مما يدعم التجميع المنضبط على شرائح.
+            </p>
+          </div>
+
+          <!-- Synchronized Cash & Hedge Action Boxes -->
+          <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+            <div id="cmdCashBox" class="bg-[#090d16] border border-amber-500/40 rounded-xl px-4 py-2.5 text-center min-w-[125px] transition-all duration-300">
+              <div class="text-[11px] text-slate-400 font-bold">نسبة الكاش المقترحة</div>
+              <div id="cmdCashPct" class="text-base sm:text-lg font-black text-amber-400 tabular-nums mt-0.5">20% - 30%</div>
+            </div>
+            <div id="cmdHedgeBox" class="bg-[#090d16] border border-amber-500/40 rounded-xl px-4 py-2.5 text-center min-w-[145px] transition-all duration-300">
+              <div class="text-[11px] text-slate-400 font-bold">حالة التحوط</div>
+              <div id="cmdHedgeTitle" class="text-xs sm:text-sm font-black text-amber-400 mt-1">تحوط جزئي اختياري</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gauge + Risk Bands Table + Entry Permission Matrix -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Semi-Circular SVG Gauge -->
+        <div class="lg:col-span-4 bg-[#090d16] border border-slate-800 rounded-2xl p-4 flex flex-col items-center justify-between">
+          <div class="w-full flex items-center justify-between text-xs">
+            <span class="font-bold text-slate-300">مؤشر الإنذار المبكر المركب</span>
+            <span id="gaugeBandBadge" class="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-500/15 text-amber-300 border border-amber-500/35">حذر</span>
+          </div>
+
+          <div class="relative w-56 h-32 my-2 flex items-end justify-center">
+            <svg viewBox="0 0 200 115" class="w-full h-full overflow-visible">
+              <defs>
+                <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#10b981" />
+                  <stop offset="35%" stop-color="#f59e0b" />
+                  <stop offset="70%" stop-color="#f97316" />
+                  <stop offset="100%" stop-color="#ef4444" />
+                </linearGradient>
+              </defs>
+              <!-- Background Track -->
+              <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#1e293b" stroke-width="16" stroke-linecap="round" />
+              <!-- Active Arc -->
+              <path id="gaugeArc" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gaugeGrad)" stroke-width="16" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="160" style="transition: stroke-dashoffset 0.6s ease;" />
+            </svg>
+            <div class="absolute bottom-1 text-center">
+              <div id="compositeScoreVal" class="text-4xl font-black text-white tabular-nums leading-none">36</div>
+              <div class="text-[11px] text-slate-400 font-bold mt-1">من 100</div>
+            </div>
+          </div>
+
+          <!-- Systemic vs Valuation Sub-scores -->
+          <div class="w-full grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-800/80">
+            <div class="bg-[#0f172a] rounded-xl p-2 text-center border border-slate-800">
+              <div class="text-[11px] text-slate-400">ضغط السيولة والائتمان</div>
+              <div id="systemicStressVal" class="text-sm font-black text-sky-400 tabular-nums mt-0.5">31%</div>
+            </div>
+            <div class="bg-[#0f172a] rounded-xl p-2 text-center border border-slate-800">
+              <div class="text-[11px] text-slate-400">ضغط التقلب والتقييم</div>
+              <div id="valuationStressVal" class="text-sm font-black text-amber-400 tabular-nums mt-0.5">42%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5 Operational Risk Bands Table -->
+        <div class="lg:col-span-4 bg-[#090d16] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
+          <div class="text-xs font-extrabold text-slate-200 mb-2">جدول النطاقات التشغيلية للمخاطر (0–100)</div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-right border-collapse">
+              <thead>
+                <tr class="text-slate-400 border-b border-slate-800">
+                  <th class="py-1.5 px-2">النطاق</th>
+                  <th class="py-1.5 px-2">التوصيف</th>
+                  <th class="py-1.5 px-2">الإجراء</th>
+                </tr>
+              </thead>
+              <tbody id="riskBandsTableBody" class="divide-y divide-slate-800/60">
+                <tr data-band="0" class="transition-colors"><td class="py-1.5 px-2 font-black text-emerald-400 tabular-nums">0–24</td><td class="py-1.5 px-2 font-bold">استقرار وتوسع</td><td class="py-1.5 px-2 text-slate-400">تعزيز منضبط</td></tr>
+                <tr data-band="1" class="transition-colors"><td class="py-1.5 px-2 font-black text-amber-400 tabular-nums">25–49</td><td class="py-1.5 px-2 font-bold">تصحيح تقييمات</td><td class="py-1.5 px-2 text-slate-400">تجميع تدريجي</td></tr>
+                <tr data-band="2" class="transition-colors"><td class="py-1.5 px-2 font-black text-orange-400 tabular-nums">50–69</td><td class="py-1.5 px-2 font-bold">ضغط سيولة مبكر</td><td class="py-1.5 px-2 text-slate-400">تخفيف وتحوط</td></tr>
+                <tr data-band="3" class="transition-colors"><td class="py-1.5 px-2 font-black text-rose-400 tabular-nums">70–84</td><td class="py-1.5 px-2 font-bold">خطر ائتماني</td><td class="py-1.5 px-2 text-slate-400">حماية الكاش</td></tr>
+                <tr data-band="4" class="transition-colors"><td class="py-1.5 px-2 font-black text-red-500 tabular-nums">85–100</td><td class="py-1.5 px-2 font-bold">أزمة سيولة شاملة</td><td class="py-1.5 px-2 text-slate-400">تجميد الدخول</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-2 pt-2 border-t border-slate-800/80 text-[11px] text-slate-500">
+            النطاق يصف المؤشر المركب وحده؛ الحكم والإجراء الفعلي يحددهما الحكم المؤكد أعلاه (المركب + بوابات الأزمة المصرفية).
+          </div>
+          <div class="mt-1 text-[11px] text-slate-400">
+            تشخيص الرافعة (OI): <strong id="oiHealthTitle" class="text-cyan-300">تخفيف رافعة صحي / تدوير</strong>
+          </div>
+        </div>
+
+        <!-- Entry Permission Matrix -->
+        <div class="lg:col-span-4 bg-[#090d16] border border-slate-800 rounded-2xl p-4 flex flex-col justify-between space-y-2.5">
+          <div class="text-xs font-extrabold text-slate-200">مصفوفة إذن الدخول الفوري حسب فئة الأصل</div>
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center justify-between bg-[#0f172a] px-3 py-2 rounded-xl border border-slate-800/80">
+              <span class="font-bold text-slate-300">الأسهم (Equities)</span>
+              <span id="permEquities" class="font-extrabold text-emerald-400">تجميع تدريجي (DCA)</span>
+            </div>
+            <div class="flex items-center justify-between bg-[#0f172a] px-3 py-2 rounded-xl border border-slate-800/80">
+              <span class="font-bold text-slate-300">الذهب (Gold)</span>
+              <span id="permGold" class="font-extrabold text-emerald-400">مسموح / توازن</span>
+            </div>
+            <div class="flex items-center justify-between bg-[#0f172a] px-3 py-2 rounded-xl border border-slate-800/80">
+              <span class="font-bold text-slate-300">الكريبتو (Crypto)</span>
+              <span id="permCrypto" class="font-extrabold text-amber-300">شرائح متدرجة</span>
+            </div>
+            <div class="flex items-center justify-between bg-[#0f172a] px-3 py-2 rounded-xl border border-slate-800/80">
+              <span class="font-bold text-slate-300">السندات السيادية (Bonds)</span>
+              <span id="permBonds" class="font-extrabold text-sky-300">ملاذ متوازن وانتقائي</span>
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-400 bg-[#0f172a] rounded-xl p-2 border border-slate-800">
+            ملاحظة: الإذن مشتق من الحكم المؤكد فقط (المؤشر المركب + بوابات الأزمة المصرفية)، ويُعلَّق تلقائياً إذا كانت البيانات غير صالحة للقرار.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- 3. OPEN INTEREST & LIQUIDITY MATRIX (9 GLOBAL ASSETS + SCATTER)       -->
+    <!-- ===================================================================== -->
+    <section class="bg-[#0f172a] border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl shadow-black/40 space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800 pb-3">
+        <div>
+          <span class="text-xs font-bold text-cyan-400">كشف التموضع المؤسسي والرافعة المالية</span>
+          <h2 class="text-lg sm:text-xl font-black text-white">مصفوفة العقود المفتوحة (Open Interest) وخريطة السيولة</h2>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 text-[11px]">
+          <span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold">↑سعر ↑OI: دخول شراء</span>
+          <span class="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold">↑سعر ↓OI: تغطية بيع</span>
+          <span class="px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-300 border border-orange-500/30 font-bold">↓سعر ↑OI: بناء بيع</span>
+          <span class="px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 font-bold">↓سعر ↓OI: تصفية Flush</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
+        <!-- 9-Asset Table -->
+        <div class="xl:col-span-8 overflow-x-auto bg-[#090d16] border border-slate-800 rounded-2xl p-3">
+          <table class="w-full text-xs text-right border-collapse min-w-[640px]">
+            <thead>
+              <tr class="text-slate-400 border-b border-slate-800">
+                <th class="py-2 px-2">الأصل / السلعة</th>
+                <th class="py-2 px-2">السعر</th>
+                <th class="py-2 px-2">تغيّر 24س</th>
+                <th class="py-2 px-2">تغيّر OI</th>
+                <th class="py-2 px-2">التفسير الرباعي</th>
+                <th class="py-2 px-2">المصدر</th>
+              </tr>
+            </thead>
+            <tbody id="oiMatrixBody" class="divide-y divide-slate-800/70">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Interactive Scatter Plot: Price % vs OI % -->
+        <div class="xl:col-span-4 bg-[#090d16] border border-slate-800 rounded-2xl p-4 flex flex-col">
+          <div class="text-xs font-extrabold text-slate-200 mb-2">خريطة التشتت: تغيّر السعر (%) مقابل تغيّر OI (%)</div>
+          <div class="relative flex-1 min-h-[260px]">
+            <canvas id="oiScatterChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- 4. THE 10 CORE INSTITUTIONAL INDICATORS + LIVE TREND CHART            -->
+    <!-- ===================================================================== -->
+    <section class="bg-[#0f172a] border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl shadow-black/40 space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800 pb-3">
+        <div>
+          <span class="text-xs font-bold text-cyan-400">اختبار الضغط التفاعلي على المحاور الثلاثة</span>
+          <h2 class="text-lg sm:text-xl font-black text-white">المؤشرات المؤسسية العشرة والمسار اللحظي للمخاطر</h2>
+        </div>
+        <button type="button" id="resetSlidersBtn" class="no-print self-start sm:self-auto px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 cursor-pointer">
+          إعادة ضبط المؤشرات
+        </button>
+      </div>
+
+      <!-- Live Trend Chart -->
+      <div class="bg-[#090d16] border border-slate-800 rounded-2xl p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-extrabold text-slate-200">المسار اللحظي لمؤشر الإنذار المبكر (Live Composite Trend)</span>
+          <span id="trendNote" class="text-[11px] text-slate-400">يُسجَّل فقط عند وصول قراءة حقيقية جديدة</span>
+        </div>
+        <div class="relative h-44 sm:h-52">
+          <canvas id="liveTrendChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 3 Pillars Grid (10 Indicators) -->
+      <div id="pillarsContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <!-- Populated dynamically -->
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- 5. 11 US MARKET SECTORS HEATMAP & ROTATION                            -->
+    <!-- ===================================================================== -->
+    <section class="bg-[#0f172a] border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl shadow-black/40 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800 pb-3">
+        <div>
+          <span class="text-xs font-bold text-cyan-400">تدوير السيولة بين القطاعات الدورية والدفاعية</span>
+          <h2 class="text-lg sm:text-xl font-black text-white">خريطة حرارة قطاعات السوق الـ 11 (S&amp;P Sectors)</h2>
+        </div>
+        <div id="sectorRotationSummary" class="text-xs font-bold text-slate-300 bg-[#090d16] px-3 py-1.5 rounded-xl border border-slate-800">
+          --
+        </div>
+      </div>
+
+      <div id="sectorsHeatmapGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+        <!-- Populated dynamically -->
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- 6. SMART ANOMALY RADAR & EMAIL ALERT ENGINE                           -->
+    <!-- ===================================================================== -->
+    <section class="bg-[#0f172a] border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl shadow-black/40 space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-slate-800 pb-3">
+        <div>
+          <span class="text-xs font-bold text-rose-400">الرصد التلقائي للشذوذ المفاجئ وإشعارات البريد الإلكتروني</span>
+          <h2 class="text-lg sm:text-xl font-black text-white">رادار الشذوذ الذكي وسجل التنبيهات العاجلة</h2>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 no-print">
+          <button type="button" id="simDangerBtn" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/35 cursor-pointer">
+            محاكاة إنذار خطر
+          </button>
+          <button type="button" id="simPositiveBtn" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 cursor-pointer">
+            محاكاة اختراق إيجابي
+          </button>
+          <button type="button" id="testEmailBtn" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 cursor-pointer">
+            اختبار إرسال إيميل
+          </button>
+        </div>
+      </div>
+
+      <!-- Alert Log List -->
+      <div id="alertLogContainer" class="space-y-2 max-h-64 overflow-y-auto pr-1">
+        <div class="text-xs text-slate-400 text-center py-6 bg-[#090d16] rounded-xl border border-slate-800">
+          يسجّل السجل التحولات النظامية المؤكدة من بيانات حقيقية، والتنبيهات التجريبية. لا توجد تنبيهات بعد.
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- 7. FULL INSTITUTIONAL REPORT (6 CARDS + INLINE TAGS + COPY/QUOTE)     -->
+    <!-- ===================================================================== -->
+    <section id="fullReportSection" class="bg-[#0f172a] border border-slate-800 rounded-2xl p-4 sm:p-7 shadow-xl shadow-black/40 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-800 pb-4">
+        <div>
+          <span class="inline-block text-xs font-bold tracking-wider text-cyan-400 mb-1">تقرير تحليلي متكامل مُحدّث آلياً بلغة سهلة ومباشرة لاتخاذ القرار</span>
+          <h2 class="text-xl sm:text-2xl font-black text-slate-50">التقرير المؤسسي الكامل للسيولة والعقود المفتوحة والأسواق</h2>
+          <p id="reportTimestampMeta" class="text-xs text-slate-400 mt-1">تم توليد القراءة وفق أحدث معطيات المنصة</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 no-print">
+          <button type="button" id="copyReportBtn" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 transition-colors cursor-pointer">
+            نسخ التقرير الكامل
+          </button>
+          <button type="button" id="printReportBtn" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors cursor-pointer">
+            طباعة / حفظ PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Report Provenance Warning -->
+      <div id="reportGateBar" class="hidden rounded-xl px-4 py-2.5 border border-amber-500/40 bg-amber-500/10 text-amber-300 text-xs font-extrabold"></div>
+
+      <!-- Quick Reading Guide Bar -->
+      <div class="bg-[#090d16] border border-slate-800 rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="font-extrabold text-slate-200 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+          دليل القراءة السريعة للأوسمة التفسيرية بعد كل مؤشر:
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="inline-tag tag-pos">إيجابي / داعم</span>
+          <span class="inline-tag tag-neu">محايد / حذر</span>
+          <span class="inline-tag tag-neg">سلبي / خطر عاجل</span>
+        </div>
+      </div>
+
+      <!-- 6 Independent Report Cards -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <!-- Card 1 -->
+        <article class="bg-[#090d16] border border-slate-800 hover:border-slate-700 rounded-2xl p-5 flex flex-col justify-between gap-3 transition-colors">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-sky-500/15 text-sky-400 font-black text-sm flex items-center justify-center shrink-0">1</span>
+              <h3 class="text-sm sm:text-base font-extrabold text-slate-100">التشخيص الكلي للسيولة ومخاطر الائتمان</h3>
+            </div>
+            <div class="flex items-center gap-1.5 no-print">
+              <button type="button" data-copy-part="1" class="copy-part-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 cursor-pointer">نسخ الفقرة</button>
+              <button type="button" data-quote-part="1" class="quote-part-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 cursor-pointer">اقتباس</button>
+            </div>
+          </div>
+          <p id="reportPart1" class="text-sm text-slate-300 leading-8"></p>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="bg-[#090d16] border border-slate-800 hover:border-slate-700 rounded-2xl p-5 flex flex-col justify-between gap-3 transition-colors">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-400 font-black text-sm flex items-center justify-center shrink-0">2</span>
+              <h3 class="text-sm sm:text-base font-extrabold text-slate-100">قراءة المؤشرات القيادية (السيولة، السندات، الدولار، والتقلب)</h3>
+            </div>
+            <div class="flex items-center gap-1.5 no-print">
+              <button type="button" data-copy-part="2" class="copy-part-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 cursor-pointer">نسخ الفقرة</button>
+              <button type="button" data-quote-part="2" class="quote-part-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 cursor-pointer">اقتباس</button>
+            </div>
+          </div>
+          <p id="reportPart2" class="text-sm text-slate-300 leading-8"></p>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="bg-[#090d16] border border-slate-800 hover:border-slate-700 rounded-2xl p-5 flex flex-col justify-between gap-3 transition-colors">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-400 font-black text-sm flex items-center justify-center shrink-0">3</span>
+              <h3 class="text-sm sm:text-base font-extrabold text-slate-100">صحة السوق الداخلية والتمويل المصرفي والتحوط</h3>
+            </div>
+            <div class="flex items-center gap-1.5 no-print">
+              <button type="button" data-copy-part="3" class="copy-part-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 cursor-pointer">نسخ الفقرة</button>
+              <button type="button" data-quote-part="3" class="quote-part-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 cursor-pointer">اقتباس</button>
+            </div>
+          </div>
+          <p id="reportPart3" class="text-sm text-slate-300 leading-8"></p>
+        </article>
+
+        <!-- Card 4 -->
+        <article class="bg-[#090d16] border border-cyan-500/25 hover:border-cyan-500/45 rounded-2xl p-5 flex flex-col justify-between gap-3 transition-colors">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-cyan-500/15 text-cyan-400 font-black text-sm flex items-center justify-center shrink-0">4</span>
+              <h3 class="text-sm sm:text-base font-extrabold text-slate-100">قراءة العقود المفتوحة (Open Interest) للسلع والذهب والكريبتو</h3>
+            </div>
+            <div class="flex items-center gap-1.5 no-print">
+              <button type="button" data-copy-part="4" class="copy-part-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 cursor-pointer">نسخ الفقرة</button>
+              <button type="button" data-quote-part="4" class="quote-part-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 cursor-pointer">اقتباس</button>
+            </div>
+          </div>
+          <p id="reportPart4" class="text-sm text-slate-300 leading-8"></p>
+        </article>
+
+        <!-- Card 5 -->
+        <article class="bg-[#090d16] border border-slate-800 hover:border-slate-700 rounded-2xl p-5 flex flex-col justify-between gap-3 transition-colors">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-violet-500/15 text-violet-400 font-black text-sm flex items-center justify-center shrink-0">5</span>
+              <h3 class="text-sm sm:text-base font-extrabold text-slate-100">خريطة قطاعات الأسهم الـ 11 ورادار التنبيهات العاجلة</h3>
+            </div>
+            <div class="flex items-center gap-1.5 no-print">
+              <button type="button" data-copy-part="5" class="copy-part-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 cursor-pointer">نسخ الفقرة</button>
+              <button type="button" data-quote-part="5" class="quote-part-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 cursor-pointer">اقتباس</button>
+            </div>
+          </div>
+          <p id="reportPart5" class="text-sm text-slate-300 leading-8"></p>
+        </article>
+
+        <!-- Card 6 -->
+        <article class="bg-[#090d16] border border-emerald-500/25 hover:border-emerald-500/45 rounded-2xl p-5 flex flex-col justify-between gap-3 transition-colors">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-rose-500/15 text-rose-400 font-black text-sm flex items-center justify-center shrink-0">6</span>
+              <h3 class="text-sm sm:text-base font-extrabold text-slate-100">الخلاصة التشغيلية وخطة اتخاذ القرار</h3>
+            </div>
+            <div class="flex items-center gap-1.5 no-print">
+              <button type="button" data-copy-part="6" class="copy-part-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 cursor-pointer">نسخ الفقرة</button>
+              <button type="button" data-quote-part="6" class="quote-part-btn px-2.5 py-1 rounded-lg text-[11px] font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 cursor-pointer">اقتباس</button>
+            </div>
+          </div>
+          <p id="reportPart6" class="text-sm text-slate-300 leading-8"></p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- 8. EXECUTIVE SUMMARY (الإيجاز التنفيذي لاتخاذ القرار - END OF PAGE)   -->
+    <!-- ===================================================================== -->
+    <section id="executiveSummarySection" class="bg-gradient-to-l from-[#0f172a] via-[#111827] to-[#090d16] border-2 border-cyan-500/35 rounded-2xl p-5 sm:p-7 shadow-2xl shadow-black/50 space-y-5">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 border-b border-slate-700/70 pb-4">
+        <div>
+          <span class="text-xs font-bold text-amber-400">الخلاصة التنفيذية النهائية لصانع القرار</span>
+          <h2 class="text-xl sm:text-2xl font-black text-white mt-0.5">الإيجاز التنفيذي لاتخاذ القرار</h2>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <div id="execVerdictPill" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold border">
+            <span id="execVerdictDot" class="w-2.5 h-2.5 rounded-full"></span>
+            <span id="execVerdictText">نطاق المخاطر: 36/100</span>
+          </div>
+          <button type="button" id="copyExecBriefBtn" class="no-print px-3 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors cursor-pointer">
+            نسخ الإيجاز
+          </button>
+          <button type="button" id="quoteExecBriefBtn" class="no-print px-3 py-2 rounded-xl text-xs font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 transition-colors cursor-pointer">
+            اقتباس الإيجاز
+          </button>
+        </div>
+      </div>
+
+      <!-- 4 Crisp Summary Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div class="bg-[#090d16] border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="flex items-center justify-between gap-1">
+            <span class="text-xs font-extrabold text-amber-400">1. الحكم النهائي</span>
+            <span id="execBadge1" class="inline-tag tag-neu">حذر</span>
+          </div>
+          <p id="execCardVerdict" class="text-xs sm:text-sm text-slate-200 leading-relaxed font-semibold"></p>
+        </div>
+        <div class="bg-[#090d16] border border-slate-800 rounded-xl p-4 space-y-2">
+          <div class="flex items-center justify-between gap-1">
+            <span class="text-xs font-extrabold text-sky-400">2. وضع السيولة والائتمان</span>
+            <span id="execBadge2" class="inline-tag tag-pos">إيجابي</span>
+          </div>
+          <p id="execCardLiquidity" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></p>
+        </div>
+        <div class="bg-[#090d16] border border-cyan-500/25 rounded-xl p-4 space-y-2">
+          <div class="flex items-center justify-between gap-1">
+            <span class="text-xs font-extrabold text-cyan-400">3. بوصلة الأصول والـ OI</span>
+            <span id="execBadge3" class="inline-tag tag-pos">إيجابي</span>
+          </div>
+          <p id="execCardOi" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></p>
+        </div>
+        <div class="bg-[#090d16] border border-emerald-500/25 rounded-xl p-4 space-y-2">
+          <div class="flex items-center justify-between gap-1">
+            <span class="text-xs font-extrabold text-emerald-400">4. القاعدة الذهبية</span>
+            <span id="execBadge4" class="inline-tag tag-neu">انضباط</span>
+          </div>
+          <p id="execCardPriority" class="text-xs sm:text-sm text-slate-200 leading-relaxed font-semibold"></p>
+        </div>
+      </div>
+
+      <!-- 3 Strict Risk Management Rules -->
+      <div class="bg-[#090d16] border border-slate-800 rounded-xl p-4">
+        <div class="text-xs font-extrabold text-cyan-400 mb-2">القواعد الثلاث الصارمة لإدارة المخاطر وتوظيف السيولة:</div>
+        <ul id="execRulesList" class="space-y-1.5 text-xs sm:text-sm text-slate-300 list-disc list-inside">
+          <!-- Populated dynamically -->
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================================= -->
+  <!-- INSTITUTIONAL REGIME TRANSITION POPUP MODAL (نافذة تأكيد التحول)        -->
+  <!-- ======================================================================= -->
+  <div id="regimePopupModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-md p-4">
+    <div id="regimePopupCard" class="bg-[#0f172a] border-2 border-rose-500/60 rounded-2xl max-w-xl w-full p-5 sm:p-6 space-y-4 shadow-2xl shadow-black/70 max-h-[92vh] overflow-y-auto">
+      <!-- Header -->
+      <div class="flex items-start justify-between gap-3 border-b border-slate-800 pb-3.5">
+        <div class="flex items-center gap-3">
+          <div id="popupSeverityIcon" class="w-11 h-11 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0 text-xl font-black">
+            !
+          </div>
+          <div>
+            <div id="popupKicker" class="text-[11px] font-extrabold text-cyan-400">لجنة المخاطر • إشعار تأكيد تحول نظامي</div>
+            <h3 id="popupHeaderTitle" class="text-base sm:text-lg font-black text-rose-400 leading-snug">
+              تأكيد تحول نظامي: دخول منطقة فخ هبوطي وأزمة سيولة
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual Transition Badge -->
+      <div class="bg-[#090d16] border border-slate-800 rounded-xl p-3 flex flex-wrap items-center justify-center gap-2 text-xs font-extrabold">
+        <span id="popupPrevBadge" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">--</span>
+        <span class="text-cyan-400 text-base">←</span>
+        <span id="popupNewBadge" class="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/40">--</span>
+      </div>
+
+      <!-- Direct Cause Summary -->
+      <div id="popupCauseBox" class="bg-[#090d16] border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 font-bold leading-relaxed">
+        --
+      </div>
+
+      <!-- Institutional Banking / Credit Proof Checklist -->
+      <div class="space-y-2">
+        <div class="text-xs font-extrabold text-slate-300">قائمة التحقق المصرفي والائتماني (4 بوابات إلزامية):</div>
+        <div id="popupGatesList" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Synchronized Action Boxes -->
+      <div class="grid grid-cols-2 gap-3">
+        <div id="popupCashBox" class="rounded-xl p-3 text-center border bg-rose-500/10 border-rose-500/40">
+          <div class="text-[11px] text-slate-300 font-bold">نسبة الكاش المقترحة</div>
+          <div id="popupCashVal" class="text-base sm:text-lg font-black text-rose-400 tabular-nums mt-0.5">--</div>
+        </div>
+        <div id="popupHedgeBox" class="rounded-xl p-3 text-center border bg-rose-500/10 border-rose-500/40">
+          <div class="text-[11px] text-slate-300 font-bold">حالة التحوط الإلزامي</div>
+          <div id="popupHedgeVal" class="text-xs sm:text-sm font-black text-rose-400 mt-1">--</div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-slate-800">
+        <button type="button" id="copyRegimeShiftBtn" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 cursor-pointer">
+          نسخ ملخص التحول
+        </button>
+        <button type="button" id="ackRegimeBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-cyan-500 hover:bg-cyan-400 text-slate-950 cursor-pointer">
+          تأكيد واستلام القرار (Acknowledge)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- EMAIL & ALERT SETTINGS MODAL                                            -->
+  <!-- ======================================================================= -->
+  <div id="alertSettingsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="bg-[#0f172a] border border-slate-700 rounded-2xl max-w-lg w-full p-5 sm:p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-base font-black text-white">إعدادات إشعارات البريد الإلكتروني والرادار</h3>
+          <p class="text-[11px] text-slate-400">تُحفظ الإعدادات تلقائياً في متصفحك (Local Storage)</p>
+        </div>
+        <button type="button" id="closeAlertSettingsBtn" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold cursor-pointer">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label for="cfgEmail" class="block font-bold text-slate-300 mb-1">البريد الإلكتروني المستلم للتنبيهات</label>
+          <input type="email" id="cfgEmail" placeholder="name@domain.com" class="w-full px-3 py-2 rounded-xl bg-[#090d16] border border-slate-700 text-slate-100 outline-none focus:border-cyan-500" />
+        </div>
+
+        <div>
+          <label for="cfgMethod" class="block font-bold text-slate-300 mb-1">طريقة الإرسال</label>
+          <select id="cfgMethod" class="w-full px-3 py-2 rounded-xl bg-[#090d16] border border-slate-700 text-slate-100 outline-none focus:border-cyan-500">
+            <option value="mailto">الوضع المحلي / Mailto الفوري + معاينة</option>
+            <option value="webhook">إرسال عبر Webhook URL (Make / Zapier / n8n)</option>
+          </select>
+        </div>
+
+        <div id="webhookFields" class="hidden space-y-2 p-3 rounded-xl bg-[#090d16] border border-slate-800">
+          <div class="text-[11px] font-bold text-cyan-400">رابط Webhook (POST JSON)</div>
+          <input type="url" id="cfgWebhookUrl" placeholder="https://hook.example.com/alert" class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 outline-none" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-1">
+          <div>
+            <label for="cfgCooldown" class="block font-bold text-slate-300 mb-1">فترة التهدئة (بالدقائق)</label>
+            <input type="number" id="cfgCooldown" min="1" max="120" value="10" class="w-full px-3 py-2 rounded-xl bg-[#090d16] border border-slate-700 text-slate-100 outline-none" />
+          </div>
+          <div class="flex items-end pb-2">
+            <label class="inline-flex items-center gap-2 font-bold text-slate-200 cursor-pointer">
+              <input type="checkbox" id="cfgSound" checked class="accent-cyan-500 w-4 h-4 cursor-pointer" />
+              <span>تفعيل صوت التنبيه</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+        <button type="button" id="saveAlertSettingsBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-cyan-500 hover:bg-cyan-400 text-slate-950 cursor-pointer">
+          حفظ الإعدادات
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- EMAIL PREVIEW MODAL                                                     -->
+  <!-- ======================================================================= -->
+  <div id="emailPreviewModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="bg-[#0f172a] border border-slate-700 rounded-2xl max-w-lg w-full p-5 sm:p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-black text-white">معاينة رسالة التنبيه البريدية</h3>
+        <button type="button" id="closePreviewModalBtn" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold cursor-pointer">✕</button>
+      </div>
+      <div class="space-y-2 text-xs">
+        <div class="bg-[#090d16] border border-slate-800 rounded-xl p-3">
+          <span class="text-slate-400 font-bold">العنوان: </span>
+          <strong id="previewSubject" class="text-cyan-300">--</strong>
+        </div>
+        <pre id="previewBody" class="bg-[#090d16] border border-slate-800 rounded-xl p-3 text-slate-200 whitespace-pre-wrap font-sans leading-relaxed max-h-60 overflow-y-auto">--</pre>
+      </div>
+      <div class="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-slate-800">
+        <button type="button" id="copyEmailPreviewBtn" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 cursor-pointer">
+          نسخ النص
+        </button>
+        <button type="button" id="sendMailtoNowBtn" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-cyan-500 hover:bg-cyan-400 text-slate-950 cursor-pointer">
+          فتح تطبيق البريد للإرسال
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- FLOATING TOAST NOTIFICATION                                             -->
+  <!-- ======================================================================= -->
+  <div id="toastBox" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-slate-900 border border-cyan-500/50 text-cyan-200 text-xs font-extrabold shadow-2xl opacity-0 pointer-events-none transition-all duration-300">
+    تم النسخ بنجاح
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- APPLICATION LOGIC                                                       -->
+  <!-- ======================================================================= -->
+  <script>
+    (function () {
+      'use strict';
+
+      // -----------------------------------------------------------------------
+      // 1. INITIAL STATE & DATA DEFINITIONS
+      // -----------------------------------------------------------------------
+      const INDICATORS_META = [
+        // Pillar 1: Liquidity & Funding
+        { id: 'netLiquidity', pillar: 1, name: 'صافي سيولة الخزانة (TGA/RRP)', weight: 0.14, systemic: true, freq: 'weekly' },
+        { id: 'repoSofr', pillar: 1, name: 'احتياطيات البنوك والريبو (SOFR)', weight: 0.12, systemic: true, freq: 'daily' },
+        { id: 'dxy', pillar: 1, name: 'مؤشر الدولار العالمي (DXY)', weight: 0.10, systemic: true, freq: 'daily' },
+        // Pillar 2: Credit & Yields
+        { id: 'hygOas', pillar: 2, name: 'فوارق السندات عالية العائد (HYG/OAS)', weight: 0.16, systemic: true, freq: 'daily' },
+        { id: 'yieldCurve', pillar: 2, name: 'منحنى العوائد (2s10s) وسرعة التغيّر', weight: 0.09, systemic: true, freq: 'daily' },
+        { id: 'flowsPensions', pillar: 2, name: 'تدفقات الصناديق ومراكز التقاعد', weight: 0.09, systemic: true, freq: 'weekly' },
+        // Pillar 3: Volatility & Market Internals
+        { id: 'vix', pillar: 3, name: 'مؤشر الخوف والتقلب (VIX)', weight: 0.10, systemic: false, freq: 'daily' },
+        { id: 'breadth', pillar: 3, name: 'اتساع السوق (% فوق 50 و200 يوم)', weight: 0.08, systemic: false, freq: 'daily' },
+        { id: 'skewPcr', pillar: 3, name: 'مؤشر الذيل SKEW ونسبة Put/Call', weight: 0.06, systemic: false, freq: 'daily' },
+        { id: 'crossAsset', pillar: 3, name: 'ترابط الأصول وضغط الرافعة (OI)', weight: 0.06, systemic: false, freq: 'daily' }
+      ];
+
+      // -----------------------------------------------------------------------
+      // DATA PROVENANCE (Phase 1): every reading carries a source + timestamp.
+      // src: 'live' = real feed | 'sim' = placeholder baseline | 'manual' = what-if
+      // -----------------------------------------------------------------------
+      const DAY_MS = 24 * 60 * 60 * 1000;
+      const STALE_MS = { live: 10 * 60 * 1000, daily: 4 * DAY_MS, weekly: 10 * DAY_MS };
+      const OI_DEADZONE = 0.10; // |%| below this is treated as "no change" in the 4-quadrant read
+      const REGIME_SEVERITY = { expansion: 0, valuationDip: 1, earlyStress: 2, crisis: 3 };
+
+      const PILLAR_TITLES = {
+        1: { title: 'المحور الأول: السيولة والتمويل', color: 'text-sky-400' },
+        2: { title: 'المحور الثاني: الائتمان والعوائد', color: 'text-amber-400' },
+        3: { title: 'المحور الثالث: التقلب واتساع السوق', color: 'text-violet-400' }
+      };
+
+      const SCENARIOS = {
+        expansion: {
+          label: 'استقرار وتوسع',
+          values: { netLiquidity: 18, repoSofr: 15, dxy: 24, hygOas: 16, yieldCurve: 20, flowsPensions: 18, vix: 18, breadth: 20, skewPcr: 22, crossAsset: 18 }
+        },
+        valuationDip: {
+          label: 'تصحيح تقييمات (فرصة)',
+          values: { netLiquidity: 28, repoSofr: 24, dxy: 36, hygOas: 30, yieldCurve: 34, flowsPensions: 35, vix: 48, breadth: 44, skewPcr: 42, crossAsset: 38 }
+        },
+        earlyStress: {
+          label: 'ضغط سيولة مبكر',
+          values: { netLiquidity: 62, repoSofr: 58, dxy: 66, hygOas: 60, yieldCurve: 58, flowsPensions: 61, vix: 62, breadth: 64, skewPcr: 59, crossAsset: 63 }
+        },
+        crisis: {
+          label: 'أزمة سيولة وائتمان',
+          values: { netLiquidity: 88, repoSofr: 92, dxy: 86, hygOas: 91, yieldCurve: 85, flowsPensions: 89, vix: 90, breadth: 88, skewPcr: 84, crossAsset: 91 }
+        }
+      };
+
+      const SIM_BASELINE = { ...SCENARIOS.valuationDip.values };
+
+      const state = {
+        mode: 'live',
+        feedSource: 'sim',
+        intervalMs: 15000,
+        timerId: null,
+        values: { ...SIM_BASELINE },
+        // Live snapshot is the ONLY input to the confirmation engine.
+        // Phase 2 fills it through ingestObservation(); until then it holds the sim baseline.
+        live: {
+          values: { ...SIM_BASELINE },
+          prov: Object.fromEntries(Object.keys(SIM_BASELINE).map(k => [k, { src: 'sim', ts: null }])),
+          raw: null,      // Phase 2: real raw readings {netLiqB, hygOas, sofrBp, vix, dxy}
+          obsSeq: 0       // increments only when a new real observation arrives
+        },
+        whatIfPrevCode: null,
+        macroPrices: {
+          DXY: { price: 103.72, chg: 0.18 },
+          VIX: { price: 21.45, chg: 1.85 },
+          US10Y: { price: 4.28, chg: 0.04 }
+        },
+        oiAssets: [
+          { id: 'GC', name: 'الذهب (GC)', price: 2685.40, chg: 0.65, oiChg: 2.10, isCrypto: false },
+          { id: 'SI', name: 'الفضة (SI)', price: 31.42, chg: 0.92, oiChg: 1.85, isCrypto: false },
+          { id: 'CL', name: 'النفط الخام (CL)', price: 71.80, chg: -0.55, oiChg: 1.30, isCrypto: false },
+          { id: 'HG', name: 'النحاس (HG)', price: 4.24, chg: 0.38, oiChg: 0.95, isCrypto: false },
+          { id: 'BTC', name: 'بيتكوين (BTC)', price: 91450.00, chg: 1.45, oiChg: 3.20, isCrypto: true, symbol: 'BTCUSDT' },
+          { id: 'ETH', name: 'إيثيريوم (ETH)', price: 3180.00, chg: 1.12, oiChg: 2.40, isCrypto: true, symbol: 'ETHUSDT' },
+          { id: 'ES', name: 'S&P 500 (ES)', price: 5942.50, chg: -0.42, oiChg: -0.85, isCrypto: false },
+          { id: 'NQ', name: 'ناسداك 100 (NQ)', price: 20810.00, chg: -0.78, oiChg: -1.35, isCrypto: false },
+          { id: 'ZN', name: 'سندات 10 سنوات (ZN)', price: 110.25, chg: 0.24, oiChg: 1.15, isCrypto: false }
+        ],
+        sectors: [
+          { code: 'XLK', name: 'التكنولوجيا', type: 'cyc', perf: -0.85 },
+          { code: 'XLF', name: 'المالية', type: 'cyc', perf: 0.42 },
+          { code: 'XLV', name: 'الرعاية الصحية', type: 'def', perf: 0.68 },
+          { code: 'XLE', name: 'الطاقة', type: 'cyc', perf: -0.35 },
+          { code: 'XLY', name: 'الاستهلاك الكمالي', type: 'cyc', perf: -0.62 },
+          { code: 'XLP', name: 'الاستهلاك الأساسي', type: 'def', perf: 0.54 },
+          { code: 'XLI', name: 'الصناعة', type: 'cyc', perf: 0.28 },
+          { code: 'XLU', name: 'المرافق', type: 'def', perf: 0.91 },
+          { code: 'XLB', name: 'المواد الأساسية', type: 'cyc', perf: 0.15 },
+          { code: 'XLRE', name: 'العقارات', type: 'def', perf: 0.12 },
+          { code: 'XLC', name: 'الاتصالات', type: 'cyc', perf: -0.22 }
+        ],
+        trendHistory: { labels: [], scores: [] },
+        alertLog: [],
+        cooldownMap: {},
+        activePreviewAlert: null,
+        reportParts: {},
+        execBriefPlain: '',
+        alertConfig: {
+          email: '',
+          method: 'mailto',
+          webhookUrl: '',
+          cooldownMin: 10,
+          sound: true
+        },
+        regimeEngine: {
+          confirmedCode: null,      // no confirmed regime until real data arrives
+          candidateCode: null,
+          persistenceCount: 0,
+          requiredPersistence: 3,
+          hysteresis: 3,
+          lastObsSeq: 0,
+          autoPopup: true,
+          lastAckTime: null,
+          lastCauseLine: 'لا يوجد حكم مؤكد: البيانات النظامية غير متوفرة من مصدر حقيقي بعد.',
+          lastTransitionText: ''
+        }
+      };
+      // Tag every OI asset with its provenance (all simulated until a real feed fills them).
+      state.oiAssets.forEach(a => { a.src = 'sim'; a.ts = null; });
+
+      let trendChart = null;
+      let scatterChart = null;
+      let toastTimer = null;
+
+      // -----------------------------------------------------------------------
+      // 2. UTILITY & SEMANTIC FORMATTING HELPERS
+      // -----------------------------------------------------------------------
+      function getTimeStr() {
+        return new Date().toLocaleTimeString('en-GB', { hour12: false });
+      }
+
+      function getDateTimeStamp() {
+        const d = new Date();
+        return `${d.toLocaleDateString('ar-EG')} • ${getTimeStr()}`;
+      }
+
+      function fmtPct(v) {
+        const n = Number(v) || 0;
+        return `${n >= 0 ? '+' : ''}${n.toFixed(2)}%`;
+      }
+
+      // Provenance status of one reading: 'live' | 'stale' | 'sim' | 'manual'
+      function provStatus(p, freq) {
+        if (!p || p.src !== 'live') return p ? p.src : 'sim';
+        if (!p.ts) return 'stale';
+        const limit = STALE_MS[freq] || STALE_MS.daily;
+        return (Date.now() - p.ts) > limit ? 'stale' : 'live';
+      }
+
+      const PROV_LABEL = {
+        live: { txt: 'حي', cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/35' },
+        stale: { txt: 'قديم', cls: 'bg-orange-500/15 text-orange-300 border-orange-500/35' },
+        sim: { txt: 'محاكى', cls: 'bg-slate-700/40 text-slate-400 border-slate-600' },
+        manual: { txt: 'افتراضي', cls: 'bg-violet-500/15 text-violet-300 border-violet-500/35' }
+      };
+
+      function provBadge(status) {
+        const p = PROV_LABEL[status] || PROV_LABEL.sim;
+        return `<span class="inline-block px-1.5 py-0 rounded-full text-[10px] font-bold border ${p.cls}">${p.txt}</span>`;
+      }
+
+      // Decision-grade = every systemic indicator in the LIVE snapshot is live and fresh.
+      function liveDataGate() {
+        const bad = INDICATORS_META
+          .filter(ind => ind.systemic)
+          .map(ind => ({ ind, st: provStatus(state.live.prov[ind.id], ind.freq) }))
+          .filter(x => x.st !== 'live');
+        return {
+          valid: bad.length === 0,
+          simCount: bad.filter(x => x.st === 'sim').length,
+          staleCount: bad.filter(x => x.st === 'stale').length,
+          badNames: bad.map(x => x.ind.name)
+        };
+      }
+
+      function showToast(msg) {
+        const box = document.getElementById('toastBox');
+        if (!box) return;
+        box.textContent = msg;
+        box.classList.remove('opacity-0', 'pointer-events-none');
+        box.classList.add('opacity-100');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          box.classList.remove('opacity-100');
+          box.classList.add('opacity-0', 'pointer-events-none');
+        }, 2600);
+      }
+
+      function copyTextFallback(text, successMsg) {
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          showToast(successMsg || 'تم النسخ بنجاح ✓');
+        } catch (_) {
+          showToast('تعذر النسخ التلقائي');
+        }
+      }
+
+      function mkTag(label, tone) {
+        const cls = tone === 'pos' ? 'tag-pos' : tone === 'neg' ? 'tag-neg' : 'tag-neu';
+        return {
+          tone,
+          html: `<span class="inline-tag ${cls}">(${label})</span>`,
+          plain: `(${label})`
+        };
+      }
+
+      function evalScoreTag(score, posLabel, neuLabel, negLabel) {
+        if (score < 35) return mkTag(posLabel, 'pos');
+        if (score < 60) return mkTag(neuLabel, 'neu');
+        return mkTag(negLabel, 'neg');
+      }
+
+      function getOiRegime(chg, oiChg) {
+        if (Math.abs(chg) < OI_DEADZONE || Math.abs(oiChg) < OI_DEADZONE) {
+          return { code: 'neutral', label: 'غير حاسم (تغيّر طفيف)', cls: 'bg-slate-700/30 text-slate-300 border-slate-600', tone: 'neu', color: '#64748b' };
+        }
+        if (chg >= 0 && oiChg >= 0) {
+          return { code: 'longBuild', label: 'دخول شراء (Long Build)', cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/35', tone: 'pos' };
+        }
+        if (chg >= 0 && oiChg < 0) {
+          return { code: 'shortSqueeze', label: 'تغطية بيع (Short Squeeze)', cls: 'bg-amber-500/15 text-amber-300 border-amber-500/35', tone: 'neu' };
+        }
+        if (chg < 0 && oiChg >= 0) {
+          return { code: 'shortBuild', label: 'بناء بيع (Short Build)', cls: 'bg-orange-500/15 text-orange-300 border-orange-500/35', tone: 'neg' };
+        }
+        return { code: 'flush', label: 'تصفية إجبارية (Flush)', cls: 'bg-rose-500/15 text-rose-300 border-rose-500/35', tone: 'neg' };
+      }
+
+      function evalAssetOiTag(asset) {
+        const reg = getOiRegime(asset.chg, asset.oiChg);
+        const suffix = reg.tone === 'pos' ? 'إيجابي' : reg.tone === 'neg' ? 'سلبي' : 'محايد';
+        return mkTag(`${reg.label} • ${suffix}`, reg.tone);
+      }
+
+      function getRiskMeta(score) {
+        if (score < 25) {
+          return { band: 0, badge: 'آمن', title: 'استقرار وتوسع', tone: 'pos', bg: 'bg-emerald-500/15', text: 'text-emerald-300', border: 'border-emerald-500/35', bar: 'bg-emerald-400' };
+        }
+        if (score < 50) {
+          return { band: 1, badge: 'حذر', title: 'تصحيح تقييمات', tone: 'neu', bg: 'bg-amber-500/15', text: 'text-amber-300', border: 'border-amber-500/35', bar: 'bg-amber-400' };
+        }
+        if (score < 70) {
+          return { band: 2, badge: 'تحذير', title: 'ضغط سيولة مبكر', tone: 'neg', bg: 'bg-orange-500/15', text: 'text-orange-300', border: 'border-orange-500/35', bar: 'bg-orange-400' };
+        }
+        if (score < 85) {
+          return { band: 3, badge: 'خطر مرتفع', title: 'خطر ائتماني وسيولة', tone: 'neg', bg: 'bg-rose-500/15', text: 'text-rose-300', border: 'border-rose-500/35', bar: 'bg-rose-400' };
+        }
+        return { band: 4, badge: 'أزمة شاملة', title: 'أزمة سيولة نظامية', tone: 'neg', bg: 'bg-red-500/20', text: 'text-red-300', border: 'border-red-500/45', bar: 'bg-red-500' };
+      }
+
+      // -----------------------------------------------------------------------
+      // 3. ZERO-HANG MULTI-SOURCE CONNECTION ENGINE & METRICS
+      // -----------------------------------------------------------------------
+      // Badge reflects the honest state of the WHOLE dashboard, not just the crypto feed.
+      function setConnStatus(source, cryptoLive) {
+        state.feedSource = source;
+        const badge = document.getElementById('connBadge');
+        const dot = document.getElementById('connDot');
+        const txt = document.getElementById('connText');
+        if (!badge || !dot || !txt) return;
+        const gate = liveDataGate();
+        let label, tone;
+        if (gate.valid) {
+          label = 'بيانات حقيقية • صالحة للقرار'; tone = 'emerald';
+        } else if (cryptoLive) {
+          label = `BTC/ETH حي (${source}) • الماكرو محاكى`; tone = 'amber';
+        } else {
+          label = 'غير متصل • بيانات محاكاة'; tone = 'amber';
+        }
+        txt.textContent = label;
+        badge.className = `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-${tone}-500/15 text-${tone}-300 border border-${tone}-500/35`;
+        dot.className = `w-2 h-2 rounded-full bg-${tone}-400 ${tone === 'emerald' ? 'animate-pulse' : ''}`;
+      }
+
+      async function fetchWithTimeout(url, ms = 3000) {
+        const ctrl = new AbortController();
+        const tid = setTimeout(() => ctrl.abort(), ms);
+        try {
+          const res = await fetch(url, { signal: ctrl.signal });
+          clearTimeout(tid);
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return await res.json();
+        } catch (err) {
+          clearTimeout(tid);
+          throw err;
+        }
+      }
+
+      async function probeLiveCryptoApis() {
+        // 1) Try Bybit v5 public linear tickers (Price + 24h% + Open Interest)
+        try {
+          const data = await fetchWithTimeout('https://api.bybit.com/v5/market/tickers?category=linear', 3000);
+          const list = data && data.result && data.result.list ? data.result.list : [];
+          const btcRow = list.find(x => x.symbol === 'BTCUSDT');
+          const ethRow = list.find(x => x.symbol === 'ETHUSDT');
+          if (btcRow && ethRow) {
+            const btc = state.oiAssets.find(a => a.id === 'BTC');
+            const eth = state.oiAssets.find(a => a.id === 'ETH');
+            btc.price = Number(btcRow.lastPrice);
+            btc.chg = Number((Number(btcRow.price24hPcnt) * 100).toFixed(2));
+            eth.price = Number(ethRow.lastPrice);
+            eth.chg = Number((Number(ethRow.price24hPcnt) * 100).toFixed(2));
+            // Price is live; OI change % still simulated until Phase 2 adds OI history.
+            btc.src = eth.src = 'live-price';
+            btc.ts = eth.ts = Date.now();
+            setConnStatus('Bybit', true);
+            return true;
+          }
+        } catch (_) {}
+
+        // 2) Fallback: Binance Futures REST 24hr Ticker
+        try {
+          const [bRes, eRes] = await Promise.all([
+            fetchWithTimeout('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=BTCUSDT', 3000),
+            fetchWithTimeout('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=ETHUSDT', 3000)
+          ]);
+          if (bRes && bRes.lastPrice && eRes && eRes.lastPrice) {
+            const btc = state.oiAssets.find(a => a.id === 'BTC');
+            const eth = state.oiAssets.find(a => a.id === 'ETH');
+            btc.price = Number(bRes.lastPrice);
+            btc.chg = Number(Number(bRes.priceChangePercent).toFixed(2));
+            eth.price = Number(eRes.lastPrice);
+            eth.chg = Number(Number(eRes.priceChangePercent).toFixed(2));
+            btc.src = eth.src = 'live-price';
+            btc.ts = eth.ts = Date.now();
+            setConnStatus('Binance', true);
+            return true;
+          }
+        } catch (_) {}
+
+        // 3) No live source: values stay frozen and are labelled as simulated (no random drift).
+        const btc = state.oiAssets.find(a => a.id === 'BTC');
+        const eth = state.oiAssets.find(a => a.id === 'ETH');
+        [btc, eth].forEach(a => { if (a.src === 'live-price' && provStatus({ src: 'live', ts: a.ts }, 'live') === 'stale') a.src = 'sim'; });
+        setConnStatus('sim', false);
+        return false;
+      }
+
+      // -----------------------------------------------------------------------
+      // SINGLE ENTRY POINT FOR REAL DATA (Phase 2 will call this from data.json)
+      // obs = { values: {indicatorId: 0-100 score}, ts: epochMs, raw?: {netLiqB, hygOas, sofrBp, vix, dxy} }
+      // Only this function advances obsSeq, so the 3/3 engine counts real observations only.
+      // -----------------------------------------------------------------------
+      function ingestObservation(obs) {
+        if (!obs || !obs.values || !obs.ts) return;
+        Object.keys(obs.values).forEach(k => {
+          if (!(k in state.live.values)) return;
+          state.live.values[k] = Number(obs.values[k]);
+          state.live.prov[k] = { src: 'live', ts: obs.ts };
+        });
+        if (obs.raw) state.live.raw = { ...obs.raw };
+        state.live.obsSeq += 1;
+        if (state.mode === 'live') {
+          state.values = state.live.values;
+          renderAll({ newObservation: true });
+        }
+      }
+      window.OpsRoom = { ingestObservation }; // exposed for Phase 2 loader / manual testing
+
+      function computeMetrics() {
+        let weightedSum = 0;
+        let sysSum = 0;
+        let sysW = 0;
+        let valSum = 0;
+        let valW = 0;
+
+        INDICATORS_META.forEach(ind => {
+          const v = Number(state.values[ind.id]) || 0;
+          weightedSum += v * ind.weight;
+          if (ind.systemic) {
+            sysSum += v * ind.weight;
+            sysW += ind.weight;
+          } else {
+            valSum += v * ind.weight;
+            valW += ind.weight;
+          }
+        });
+
+        const avgOiChg = state.oiAssets.reduce((s, a) => s + a.oiChg, 0) / state.oiAssets.length;
+        const flushCount = state.oiAssets.filter(a => getOiRegime(a.chg, a.oiChg).code === 'flush').length;
+        const longBuildCount = state.oiAssets.filter(a => getOiRegime(a.chg, a.oiChg).code === 'longBuild').length;
+
+        return {
+          composite: Math.round(weightedSum),
+          systemicStress: Math.round(sysSum / (sysW || 1)),
+          valuationStress: Math.round(valSum / (valW || 1)),
+          avgOiChg,
+          flushCount,
+          longBuildCount
+        };
+      }
+
+      function renderTicker() {
+        const container = document.getElementById('liveTickerItems');
+        const clock = document.getElementById('lastUpdateClock');
+        if (clock) clock.textContent = getTimeStr();
+        if (!container) return;
+
+        const gc = state.oiAssets.find(a => a.id === 'GC');
+        const cl = state.oiAssets.find(a => a.id === 'CL');
+        const btc = state.oiAssets.find(a => a.id === 'BTC');
+        const eth = state.oiAssets.find(a => a.id === 'ETH');
+        const es = state.oiAssets.find(a => a.id === 'ES');
+
+        const raw = getRawReadings();
+        const items = [
+          { sym: 'BTC', val: `$${Math.round(btc.price).toLocaleString('en-US')}`, chg: btc.chg, live: btc.src === 'live-price' },
+          { sym: 'ETH', val: `$${Math.round(eth.price).toLocaleString('en-US')}`, chg: eth.chg, live: eth.src === 'live-price' },
+          { sym: 'GOLD', val: `$${gc.price.toFixed(1)}`, chg: gc.chg, live: gc.src === 'live-price' },
+          { sym: 'OIL', val: `$${cl.price.toFixed(2)}`, chg: cl.chg, live: cl.src === 'live-price' },
+          { sym: 'S&P500', val: `${es.price.toFixed(1)}`, chg: es.chg, live: es.src === 'live-price' },
+          { sym: 'DXY', val: `${raw.dxy.toFixed(2)}`, chg: state.macroPrices.DXY.chg, live: raw.isLive },
+          { sym: 'VIX', val: `${raw.vix.toFixed(2)}`, chg: state.macroPrices.VIX.chg, live: raw.isLive }
+        ];
+
+        container.innerHTML = items.map(it => {
+          const cls = it.chg >= 0 ? 'text-emerald-400' : 'text-rose-400';
+          return `<div class="inline-flex items-center gap-1.5 ${it.live ? '' : 'opacity-60'}">
+            <span class="font-black text-slate-300">${it.sym}</span>
+            <span class="font-bold text-white tabular-nums">${it.val}</span>
+            <span class="font-extrabold tabular-nums ${cls}">${fmtPct(it.chg)}</span>
+            ${it.live ? '' : '<span class="text-[9px] font-black text-slate-500">SIM</span>'}
+          </div>`;
+        }).join('<span class="text-slate-700">|</span>');
+      }
+
+      // -----------------------------------------------------------------------
+      // 4. METRICS COMPUTATION & INSTITUTIONAL CONFIRMATION ENGINE
+      // -----------------------------------------------------------------------
+      // Single source for raw readings used by gates, ticker and report.
+      // Live mode with real data -> Phase 2 raw values. Otherwise -> ILLUSTRATIVE values
+      // derived from the 0-100 scores (clearly flagged isLive:false, never shown as market facts).
+      function getRawReadings() {
+        const useLive = state.mode === 'live' && state.live.raw && liveDataGate().valid;
+        const v = state.values;
+        const derived = {
+          netLiqB: Math.round(165 - v.netLiquidity * 4.7),
+          hygOas: Number((2.85 + v.hygOas * 0.055).toFixed(2)),
+          sofrBp: Number((-2.4 + v.repoSofr * 0.34).toFixed(1)),
+          vix: Number((12.0 + v.vix * 0.32).toFixed(2)),
+          dxy: Number((99.5 + v.dxy * 0.11).toFixed(2)),
+          curveBps: Math.round(-38 + v.yieldCurve * 1.1),
+          d50: Math.max(8, Math.round(86 - v.breadth * 0.72)),
+          d200: Math.max(14, Math.round(88 - v.breadth * 0.62)),
+          skew: Math.round(118 + v.skewPcr * 0.4),
+          pcr: Number((0.68 + v.skewPcr * 0.0065).toFixed(2)),
+          flowsB: Number((16 - v.flowsPensions * 0.44).toFixed(1)),
+          isLive: false
+        };
+        return useLive ? { ...derived, ...state.live.raw, isLive: true } : derived;
+      }
+
+      function evaluateBankingGates() {
+        const raw = getRawReadings();
+        const netLiqB = raw.netLiqB;
+        const hygOasNum = raw.hygOas;
+        const sofrBp = raw.sofrBp;
+        const vixNum = raw.vix;
+        const dxyNum = raw.dxy;
+
+        const gates = [
+          {
+            id: 'hyg',
+            label: 'HY OAS ≥ 5.50%',
+            current: `${hygOasNum.toFixed(2)}%`,
+            breached: hygOasNum >= 5.50,
+            desc: `تجاوز HY OAS مستوى ${hygOasNum.toFixed(2)}%`
+          },
+          {
+            id: 'sofr',
+            label: 'SOFR-IORB ≥ 15 bps',
+            current: `${sofrBp >= 0 ? '+' : ''}${sofrBp} bps`,
+            breached: sofrBp >= 15,
+            desc: `ارتفاع ضغط الريبو SOFR إلى ${sofrBp} نقطة أساس`
+          },
+          {
+            id: 'netLiq',
+            label: 'TGA/RRP ≤ -$80B',
+            current: `${netLiqB >= 0 ? '+' : ''}$${netLiqB}B`,
+            breached: netLiqB <= -80,
+            desc: `سحب سيولة خزانة حاد (${netLiqB} مليار دولار)`
+          },
+          {
+            id: 'vixDxy',
+            label: 'VIX ≥ 30 & DXY ≥ 106',
+            current: `VIX ${vixNum.toFixed(1)} | DXY ${dxyNum.toFixed(1)}`,
+            breached: vixNum >= 30 && dxyNum >= 106,
+            desc: `قفزة مزدوجة في VIX (${vixNum.toFixed(1)}) والدولار (${dxyNum.toFixed(1)})`
+          }
+        ];
+
+        const breachedList = gates.filter(g => g.breached);
+        return { gates, breachedList, breachedCount: breachedList.length };
+      }
+
+      function determineRawRegime(m, gateEval, cur) {
+        const h = state.regimeEngine.hysteresis; // ±3 points hysteresis band
+
+        // Multi-factor banking confirmation for Crisis (Bear Trap)
+        const crisisScoreMet = cur === 'crisis' ? m.composite >= (70 - h) : m.composite >= (70 + h);
+        const crisisBankingMet = gateEval.breachedCount >= 2 || m.systemicStress >= 72;
+        if ((crisisScoreMet || m.composite >= 78) && crisisBankingMet) return 'crisis';
+
+        // Early Liquidity Stress
+        const stressThreshold = cur === 'earlyStress' ? (50 - h) : (50 + h);
+        if (m.composite >= stressThreshold || m.systemicStress >= 54 || gateEval.breachedCount >= 1) return 'earlyStress';
+
+        // Valuation Dip / Caution
+        const dipThreshold = cur === 'valuationDip' ? (25 - h) : (25 + h);
+        if (m.composite >= dipThreshold) return 'valuationDip';
+
+        return 'expansion';
+      }
+
+      function buildCauseLine(code, m, gateEval) {
+        if (gateEval.breachedCount > 0) {
+          const reasons = gateEval.breachedList.slice(0, 2).map(g => g.desc).join(' و');
+          return `سبب التحول المؤكد: ${reasons} (${gateEval.breachedCount}/4 بوابات مصرفية مخترقة).`;
+        }
+        if (code === 'earlyStress') {
+          return `سبب التحول المؤكد: ارتفاع ضغط السيولة النظامي إلى ${m.systemicStress}% وتجاوز المؤشر المركب عتبة التحذير (${m.composite}/100).`;
+        }
+        if (code === 'valuationDip') {
+          return `سبب الحكم المؤكد: ضغط التقييمات (${m.valuationStress}%) أعلى من ضغط السيولة (${m.systemicStress}%) مع بقاء بوابات الأزمة المصرفية سليمة (0/4).`;
+        }
+        return `سبب الحكم المؤكد: استقرار السيولة والائتمان (${m.systemicStress}%) وتراجع التقلب إلى نطاق التوسع (${m.composite}/100).`;
+      }
+
+      // opts.newObservation : a NEW real observation arrived (only ingestObservation sets it)
+      // opts.scenarioClick   : user pressed a scenario button (what-if, may show a popup)
+      function evaluateRegimeTransition(m, opts = {}) {
+        const gateEval = evaluateBankingGates();
+        const eng = state.regimeEngine;
+
+        // ---- WHAT-IF (sliders / scenarios): never touches the live engine, never alerts ----
+        if (state.mode !== 'live') {
+          const rawCode = determineRawRegime(m, gateEval, state.whatIfPrevCode);
+          const cause = buildCauseLine(rawCode, m, gateEval).replace('سبب الحكم المؤكد', 'سبب الحكم الافتراضي').replace('سبب التحول المؤكد', 'سبب الحكم الافتراضي');
+          if (opts.scenarioClick && eng.autoPopup && rawCode !== state.whatIfPrevCode) {
+            openRegimePopup(state.whatIfPrevCode, rawCode, gateEval, computeDecision(rawCode), cause, true);
+          }
+          state.whatIfPrevCode = rawCode;
+          return {
+            confirmedCode: rawCode,
+            gateEval,
+            statusBadge: 'اختبار ضغط افتراضي • غير مؤكد',
+            isPending: false,
+            isWhatIf: true,
+            causeLine: cause
+          };
+        }
+
+        // ---- LIVE: decision-grade data required ----
+        const gate = liveDataGate();
+        if (!gate.valid) {
+          return {
+            confirmedCode: 'invalid',
+            gateEval,
+            statusBadge: gate.simCount > 0 ? `معلّق • ${gate.simCount} مؤشرات نظامية محاكاة` : `معلّق • ${gate.staleCount} مؤشرات قديمة`,
+            isPending: true,
+            gate,
+            causeLine: `لا يمكن إصدار حكم: ${gate.badNames.slice(0, 3).join('، ')}${gate.badNames.length > 3 ? '…' : ''} غير متوفرة من مصدر حقيقي محدّث.`
+          };
+        }
+
+        // Persistence advances ONLY on a new real observation (not on re-renders, slider drags, or reconnects).
+        const isNewObs = opts.newObservation && state.live.obsSeq !== eng.lastObsSeq;
+        if (isNewObs) {
+          eng.lastObsSeq = state.live.obsSeq;
+          const rawCode = determineRawRegime(m, gateEval, eng.confirmedCode);
+
+          if (rawCode === eng.confirmedCode) {
+            eng.candidateCode = null;
+            eng.persistenceCount = eng.requiredPersistence;
+            eng.lastCauseLine = buildCauseLine(eng.confirmedCode, m, gateEval);
+          } else {
+            if (eng.candidateCode === rawCode) {
+              eng.persistenceCount = Math.min(eng.requiredPersistence, eng.persistenceCount + 1);
+            } else {
+              eng.candidateCode = rawCode;
+              eng.persistenceCount = 1;
+            }
+            if (eng.persistenceCount >= eng.requiredPersistence) {
+              const prevCode = eng.confirmedCode;
+              eng.confirmedCode = rawCode;
+              eng.candidateCode = null;
+              eng.lastCauseLine = buildCauseLine(rawCode, m, gateEval);
+              const newDecision = computeDecision(rawCode);
+              if (eng.autoPopup) openRegimePopup(prevCode, rawCode, gateEval, newDecision, eng.lastCauseLine, false);
+              const escalation = prevCode !== null && REGIME_SEVERITY[rawCode] > REGIME_SEVERITY[prevCode];
+              triggerAlert(
+                rawCode === 'crisis' || rawCode === 'earlyStress' ? 'danger' : 'positive',
+                'تحول نظامي مؤكد',
+                newDecision.shortName,
+                eng.lastCauseLine,
+                { key: `regime_${rawCode}`, bypassCooldown: escalation }
+              );
+            }
+          }
+        }
+
+        if (eng.confirmedCode === null) {
+          return {
+            confirmedCode: 'invalid',
+            gateEval,
+            statusBadge: `قيد التحقق المؤسسي (${eng.persistenceCount}/${eng.requiredPersistence} قراءات)`,
+            isPending: true,
+            causeLine: 'البيانات حقيقية، لكن لم تكتمل 3 قراءات متتالية متطابقة لتأكيد الحكم الأول.'
+          };
+        }
+
+        const pending = eng.candidateCode !== null;
+        return {
+          confirmedCode: eng.confirmedCode,
+          gateEval,
+          statusBadge: pending
+            ? `قيد التحقق المؤسسي (${eng.persistenceCount}/${eng.requiredPersistence} قراءات)`
+            : `حكم مؤكد مؤسسياً (ثبات ${eng.requiredPersistence}/${eng.requiredPersistence})`,
+          isPending: pending,
+          causeLine: eng.lastCauseLine
+        };
+      }
+
+      function computeDecision(code) {
+        if (code === 'invalid' || code === null || code === undefined) {
+          return {
+            code: 'invalid',
+            shortName: 'لا يوجد حكم (بيانات غير صالحة)',
+            title: 'غير صالح للقرار — بانتظار بيانات حقيقية',
+            desc: 'المؤشرات النظامية غير متوفرة من مصدر حقيقي محدّث، لذلك لا تُصدر المنصة حكماً ولا نسبة كاش. استخدم السيناريوهات أو المنزلقات لاختبار الضغط الافتراضي فقط.',
+            bannerCls: 'bg-slate-800/40 border-slate-600',
+            titleCls: 'text-slate-300',
+            cashBoxCls: 'bg-slate-900 border-slate-700',
+            cashTextCls: 'text-slate-500',
+            hedgeBoxCls: 'bg-slate-900 border-slate-700',
+            hedgeTextCls: 'text-slate-500',
+            cashPct: '—',
+            hedgeTitle: 'معلّق',
+            permEquities: { text: 'معلّق', cls: 'text-slate-500' },
+            permGold: { text: 'معلّق', cls: 'text-slate-500' },
+            permCrypto: { text: 'معلّق', cls: 'text-slate-500' },
+            permBonds: { text: 'معلّق', cls: 'text-slate-500' },
+            oiHealthTitle: 'غير متاح (بيانات محاكاة)',
+            rules: [
+              'لا قرارات توظيف أو تحوط مبنية على هذه الصفحة قبل اكتمال بوابة البيانات الحقيقية.',
+              'نتائج السيناريوهات والمنزلقات افتراضية لاختبار المنطق فقط.',
+              'الحكم الأول يحتاج 3 قراءات حقيقية متتالية متطابقة.'
+            ]
+          };
+        }
+        if (code === 'crisis') {
+          return {
+            code: 'crisis',
+            shortName: 'فخ هبوطي وأزمة سيولة (أحمر)',
+            title: 'فخ هبوطي محتمل — أزمة سيولة وائتمان (حماية الكاش أولاً)',
+            desc: 'تصدع فوارق الائتمان وارتفاع ضغط التمويل المصرفي يجعلان أي ارتداد مؤقتاً؛ الأولوية القصوى لحماية السيولة.',
+            bannerCls: 'bg-rose-500/15 border-rose-500/50 shadow-lg shadow-rose-950/30',
+            titleCls: 'text-rose-400',
+            cashBoxCls: 'bg-rose-950/40 border-rose-500/60 shadow-md shadow-rose-950/40',
+            cashTextCls: 'text-rose-400',
+            hedgeBoxCls: 'bg-rose-950/40 border-rose-500/60 shadow-md shadow-rose-950/40',
+            hedgeTextCls: 'text-rose-400',
+            cashPct: '50% - 75%',
+            hedgeTitle: 'تحوط كامل إلزامي',
+            permEquities: { text: 'ممنوع / انتظار', cls: 'text-rose-400' },
+            permGold: { text: 'حذر (مراقبة Margin Calls)', cls: 'text-amber-300' },
+            permCrypto: { text: 'تجميد الدخول', cls: 'text-rose-400' },
+            permBonds: { text: 'مسموح (ملاذ سيادي آمن)', cls: 'text-emerald-400' },
+            oiHealthTitle: 'غسيل سيولة وتصفية إجبارية (Flush)',
+            rules: [
+              'تجميد الدخول الفوري في الأصول عالية المخاطر والاحتفاظ بـ 50%–75% سيولة نقدية.',
+              'عدم مطاردة أي ارتداد تقني قبل هبوط فوارق HY OAS واستقرار تمويل الريبو SOFR (عودة البوابات إلى أقل من 2/4).',
+              'مراقبة تصفية العقود المفتوحة (Flush) في الذهب والأسهم لتجنب نداءات الهامش.'
+            ]
+          };
+        }
+        if (code === 'earlyStress') {
+          return {
+            code: 'earlyStress',
+            shortName: 'ضغط سيولة مبكر (برتقالي)',
+            title: 'ضغط سيولة مبكر — تخفيف المخاطر وتفعيل التحوط',
+            desc: 'بدأت إشارات التشدد تظهر في الدولار أو السندات؛ يُنصح بتقليص الرافعة والانتظار قبل زيادة المراكز.',
+            bannerCls: 'bg-orange-500/15 border-orange-500/50',
+            titleCls: 'text-orange-400',
+            cashBoxCls: 'bg-orange-950/35 border-orange-500/55',
+            cashTextCls: 'text-orange-400',
+            hedgeBoxCls: 'bg-orange-950/35 border-orange-500/55',
+            hedgeTextCls: 'text-orange-400',
+            cashPct: '35% - 50%',
+            hedgeTitle: 'تحوط دفاعي نشط',
+            permEquities: { text: 'تخفيف / دفاعي فقط', cls: 'text-orange-400' },
+            permGold: { text: 'مسموح (ملاذ تحوطي)', cls: 'text-emerald-400' },
+            permCrypto: { text: 'تقليص الرافعة', cls: 'text-orange-400' },
+            permBonds: { text: 'تعزيز أذون قصيرة الأجل', cls: 'text-emerald-400' },
+            oiHealthTitle: 'تضخم تحوط وبناء بيع (Short Build)',
+            rules: [
+              'رفع الكاش إلى 35%–50% وتقليص الرافعة في المراكز القائمة.',
+              'لا مراكز جديدة في الأسهم إلا دفاعية، حتى تعود بوابات الأزمة المصرفية إلى 0/4.',
+              'اختراق بوابة مصرفية ثانية أو ضغط نظامي ≥72% = الانتقال إلى وضع الأزمة وحماية الكاش.'
+            ]
+          };
+        }
+        if (code === 'valuationDip') {
+          return {
+            code: 'valuationDip',
+            shortName: 'تصحيح تقييمات / حذر (أصفر)',
+            title: 'فرصة تجميع تدريجي (تصحيح تقييمات بدون أزمة ائتمان)',
+            desc: 'الائتمان والتمويل المصرفي ضمن الحدود المنضبطة؛ التراجعات السعرية تمثل تصحيح تقييمات قابل للاستغلال على شرائح.',
+            bannerCls: 'bg-amber-500/10 border-amber-500/40',
+            titleCls: 'text-amber-300',
+            cashBoxCls: 'bg-amber-950/30 border-amber-500/45',
+            cashTextCls: 'text-amber-400',
+            hedgeBoxCls: 'bg-amber-950/30 border-amber-500/45',
+            hedgeTextCls: 'text-amber-400',
+            cashPct: '20% - 30%',
+            hedgeTitle: 'تحوط جزئي اختياري',
+            permEquities: { text: 'تجميع تدريجي (DCA)', cls: 'text-emerald-400' },
+            permGold: { text: 'مسموح / توازن', cls: 'text-emerald-400' },
+            permCrypto: { text: 'شرائح متدرجة', cls: 'text-amber-300' },
+            permBonds: { text: 'ملاذ متوازن وانتقائي', cls: 'text-sky-300' },
+            oiHealthTitle: 'تخفيف رافعة صحي / تدوير',
+            rules: [
+              'توظيف السيولة على شرائح متدرجة (DCA) مع الإبقاء على 20%–30% كاش وسقف مخاطرة صارم لكل صفقة.',
+              'مراقبة تقاطع السعر مع العقود المفتوحة (OI) لتأكيد دخول سيولة مؤسسية حقيقية.',
+              'التحوط الدفاعي يُفعَّل تلقائياً عند تأكيد حالة "ضغط سيولة مبكر" أو اختراق أي بوابة مصرفية.'
+            ]
+          };
+        }
+        return {
+          code: 'expansion',
+          shortName: 'استقرار وتوسع (أخضر)',
+          title: 'بيئة استقرار وتوسع — زخم سيولة داعم للأسواق',
+          desc: 'السيولة وفيرة وفوارق الائتمان منخفضة؛ البيئة مواتية لتوظيف رأس المال وفق إدارة مخاطر منضبطة.',
+          bannerCls: 'bg-emerald-500/10 border-emerald-500/40',
+          titleCls: 'text-emerald-400',
+          cashBoxCls: 'bg-emerald-950/30 border-emerald-500/45',
+          cashTextCls: 'text-emerald-400',
+          hedgeBoxCls: 'bg-emerald-950/30 border-emerald-500/45',
+          hedgeTextCls: 'text-emerald-400',
+          cashPct: '10% - 15%',
+          hedgeTitle: 'تحوط خفيف (ذيل فقط)',
+          permEquities: { text: 'مسموح / تعزيز', cls: 'text-emerald-400' },
+          permGold: { text: 'مسموح / اتجاه صاعد', cls: 'text-emerald-400' },
+          permCrypto: { text: 'مسموح (زخم سيولة)', cls: 'text-emerald-400' },
+          permBonds: { text: 'وزن تحوطي خفيف', cls: 'text-slate-300' },
+          oiHealthTitle: 'بناء شراء مؤسسي صحي (Long Build)',
+          rules: [
+            'توظيف رأس المال مع الإبقاء على 10%–15% كاش وسقف مخاطرة صارم لكل صفقة.',
+            'تأكيد أي دخول بتوسع العقود المفتوحة (Long Build) لا بالسعر وحده.',
+            'الانتقال إلى التجميع التدريجي فور تأكيد حالة "تصحيح تقييمات".'
+          ]
+        };
+      }
+
+      function openRegimePopup(prevCode, newCode, gateEval, decision, causeLine, isWhatIf) {
+        const prevDec = computeDecision(prevCode);
+        const kicker = document.getElementById('popupKicker');
+        if (kicker) kicker.textContent = isWhatIf ? 'اختبار ضغط افتراضي • ليس تحولاً حقيقياً' : 'لجنة المخاطر • إشعار تأكيد تحول نظامي';
+        const modal = document.getElementById('regimePopupModal');
+        const card = document.getElementById('regimePopupCard');
+        if (!modal || !card) return;
+
+        const isCrisis = newCode === 'crisis';
+        const isStress = newCode === 'earlyStress';
+        const borderTone = isCrisis ? 'border-rose-500/70' : isStress ? 'border-orange-500/70' : newCode === 'valuationDip' ? 'border-amber-500/60' : 'border-emerald-500/60';
+        card.className = `bg-[#0f172a] border-2 ${borderTone} rounded-2xl max-w-xl w-full p-5 sm:p-6 space-y-4 shadow-2xl shadow-black/70 max-h-[92vh] overflow-y-auto`;
+
+        const icon = document.getElementById('popupSeverityIcon');
+        icon.textContent = isCrisis ? '⚠' : isStress ? '!' : '✓';
+        icon.className = `w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 text-xl font-black ${decision.cashBoxCls} ${decision.cashTextCls}`;
+
+        const header = document.getElementById('popupHeaderTitle');
+        header.textContent = `${isWhatIf ? 'محاكاة' : 'تأكيد تحول نظامي'}: ${decision.title}`;
+        header.className = `text-base sm:text-lg font-black leading-snug ${decision.titleCls}`;
+
+        document.getElementById('popupPrevBadge').textContent = prevDec.shortName;
+        const newBadge = document.getElementById('popupNewBadge');
+        newBadge.textContent = decision.shortName;
+        newBadge.className = `px-2.5 py-1 rounded-lg border font-extrabold ${decision.cashBoxCls} ${decision.cashTextCls}`;
+
+        document.getElementById('popupCauseBox').textContent = causeLine;
+
+        document.getElementById('popupGatesList').innerHTML = gateEval.gates.map(g => `
+          <div class="flex items-center justify-between px-3 py-2 rounded-xl border ${g.breached ? 'bg-rose-500/15 border-rose-500/40 text-rose-300' : 'bg-[#090d16] border-slate-800 text-slate-300'}">
+            <div>
+              <div class="font-extrabold">${g.label}</div>
+              <div class="text-[11px] tabular-nums opacity-85">${g.current}</div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${g.breached ? 'bg-rose-500/25 text-rose-200' : 'bg-emerald-500/15 text-emerald-300'}">
+              ${g.breached ? 'مخترقة ✕' : 'سليمة ✓'}
+            </span>
+          </div>
+        `).join('');
+
+        document.getElementById('popupCashBox').className = `rounded-xl p-3 text-center border ${decision.cashBoxCls}`;
+        const pCash = document.getElementById('popupCashVal');
+        pCash.textContent = decision.cashPct;
+        pCash.className = `text-base sm:text-lg font-black tabular-nums mt-0.5 ${decision.cashTextCls}`;
+
+        document.getElementById('popupHedgeBox').className = `rounded-xl p-3 text-center border ${decision.hedgeBoxCls}`;
+        const pHedge = document.getElementById('popupHedgeVal');
+        pHedge.textContent = decision.hedgeTitle;
+        pHedge.className = `text-xs sm:text-sm font-black mt-1 ${decision.hedgeTextCls}`;
+
+        state.regimeEngine.lastTransitionText = `${isWhatIf ? '[محاكاة اختبار ضغط — ليس تحولاً حقيقياً]\n' : ''}تحول نظامي ${isWhatIf ? 'افتراضي' : 'مؤكد'} (${getDateTimeStamp()}):\nمن: ${prevDec.shortName} ← إلى: ${decision.shortName}\n${causeLine}\nالكاش المقترح: ${decision.cashPct} | التحوط: ${decision.hedgeTitle}`;
+
+        if (!isWhatIf) playBeep(isCrisis || isStress);
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+
+      // -----------------------------------------------------------------------
+      // 5. UI RENDERING FUNCTIONS
+      function renderDataGateBars(evalResult) {
+        const bar = document.getElementById('dataGateBar');
+        const rbar = document.getElementById('reportGateBar');
+        let msg = '', cls = '';
+        if (state.mode !== 'live') {
+          msg = 'وضع اختبار الضغط الافتراضي: جميع القيم والأحكام أدناه افتراضية لاختبار المنطق، وليست قراءة سوق.';
+          cls = 'bg-violet-500/10 border-violet-500/40 text-violet-300';
+        } else if (evalResult.confirmedCode === 'invalid') {
+          msg = `غير صالح للقرار: ${evalResult.causeLine}`;
+          cls = 'bg-amber-500/10 border-amber-500/40 text-amber-300';
+        }
+        if (bar) {
+          bar.textContent = msg;
+          bar.className = msg ? `rounded-xl px-4 py-3 border text-xs sm:text-sm font-extrabold ${cls}` : 'hidden';
+        }
+        if (rbar) {
+          rbar.textContent = msg ? `تنبيه: الأرقام في هذا التقرير توضيحية وليست قراءات سوق حقيقية — ${state.mode !== 'live' ? 'وضع افتراضي' : 'بيانات محاكاة'}.` : '';
+          rbar.className = msg ? 'rounded-xl px-4 py-2.5 border border-amber-500/40 bg-amber-500/10 text-amber-300 text-xs font-extrabold' : 'hidden';
+        }
+      }
+
+      function renderDecisionCenter(m, decision, evalResult) {
+        renderDataGateBars(evalResult);
+        const risk = getRiskMeta(m.composite);
+        const banner = document.getElementById('cmdVerdictBanner');
+        banner.className = `rounded-2xl p-4 sm:p-5 border transition-all duration-300 space-y-3 ${decision.bannerCls}`;
+        document.getElementById('cmdVerdictTitle').textContent = decision.title;
+        document.getElementById('cmdVerdictTitle').className = `text-lg sm:text-xl font-black ${decision.titleCls}`;
+        document.getElementById('cmdVerdictDesc').textContent = decision.desc;
+
+        // Synchronized Cash & Hedge Boxes (Color Semantics)
+        document.getElementById('cmdCashBox').className = `border rounded-xl px-4 py-2.5 text-center min-w-[125px] transition-all duration-300 ${decision.cashBoxCls}`;
+        const cashVal = document.getElementById('cmdCashPct');
+        cashVal.textContent = decision.cashPct;
+        cashVal.className = `text-base sm:text-lg font-black tabular-nums mt-0.5 ${decision.cashTextCls}`;
+
+        document.getElementById('cmdHedgeBox').className = `border rounded-xl px-4 py-2.5 text-center min-w-[145px] transition-all duration-300 ${decision.hedgeBoxCls}`;
+        const hedgeVal = document.getElementById('cmdHedgeTitle');
+        hedgeVal.textContent = decision.hedgeTitle;
+        hedgeVal.className = `text-xs sm:text-sm font-black mt-1 ${decision.hedgeTextCls}`;
+
+        // Confirmation Buffer Badge, Banking Gates & Direct Cause Line
+        const bufBadge = document.getElementById('confirmBufferBadge');
+        if (bufBadge && evalResult) {
+          bufBadge.textContent = evalResult.statusBadge;
+          bufBadge.className = evalResult.isPending
+            ? 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/45 animate-pulse'
+            : `inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold border ${decision.cashBoxCls} ${decision.cashTextCls}`;
+        }
+
+        const gatesBadge = document.getElementById('bankingGatesBadge');
+        if (gatesBadge && evalResult) {
+          const bc = evalResult.gateEval.breachedCount;
+          gatesBadge.textContent = `بوابات الأزمة المصرفية: ${bc}/4`;
+          gatesBadge.className = bc >= 2
+            ? 'inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-500/20 text-rose-300 border border-rose-500/45 tabular-nums'
+            : bc === 1
+            ? 'inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-orange-500/20 text-orange-300 border border-orange-500/45 tabular-nums'
+            : 'inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-900/80 text-emerald-300 border border-emerald-500/35 tabular-nums';
+        }
+
+        const causeEl = document.getElementById('directCauseText');
+        if (causeEl && evalResult) causeEl.textContent = evalResult.causeLine;
+
+        const ackEl = document.getElementById('lastAckStamp');
+        if (ackEl) {
+          ackEl.textContent = state.regimeEngine.lastAckTime ? `آخر استلام قرار: ${state.regimeEngine.lastAckTime}` : '';
+        }
+
+        document.getElementById('oiHealthTitle').textContent = decision.oiHealthTitle;
+
+        // Gauge
+        document.getElementById('compositeScoreVal').textContent = m.composite;
+        document.getElementById('systemicStressVal').textContent = `${m.systemicStress}%`;
+        document.getElementById('valuationStressVal').textContent = `${m.valuationStress}%`;
+        const badge = document.getElementById('gaugeBandBadge');
+        badge.textContent = risk.title;
+        badge.className = `px-2 py-0.5 rounded-full text-[11px] font-extrabold border ${risk.bg} ${risk.text} ${risk.border}`;
+
+        const arc = document.getElementById('gaugeArc');
+        if (arc) {
+          const totalLen = 251.3;
+          arc.style.strokeDashoffset = (totalLen - (totalLen * m.composite) / 100).toFixed(1);
+        }
+
+        // Highlight active row in 5-band table
+        document.querySelectorAll('#riskBandsTableBody tr').forEach(tr => {
+          const b = Number(tr.dataset.band);
+          if (b === risk.band) {
+            tr.className = 'bg-cyan-500/15 text-white font-bold';
+          } else {
+            tr.className = 'text-slate-300';
+          }
+        });
+
+        // Entry Permissions
+        const setPerm = (id, obj) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.textContent = obj.text;
+          el.className = `font-extrabold ${obj.cls}`;
+        };
+        setPerm('permEquities', decision.permEquities);
+        setPerm('permGold', decision.permGold);
+        setPerm('permCrypto', decision.permCrypto);
+        setPerm('permBonds', decision.permBonds);
+      }
+
+      function renderOiMatrix() {
+        const tbody = document.getElementById('oiMatrixBody');
+        if (!tbody) return;
+        tbody.innerHTML = state.oiAssets.map(a => {
+          const reg = getOiRegime(a.chg, a.oiChg);
+          const pCls = a.chg >= 0 ? 'text-emerald-400' : 'text-rose-400';
+          const oiCls = a.oiChg >= 0 ? 'text-cyan-400' : 'text-amber-400';
+          const priceStr = a.price >= 1000 ? `$${Math.round(a.price).toLocaleString('en-US')}` : `$${a.price.toFixed(2)}`;
+          return `<tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-2.5 px-2 font-extrabold text-white">${a.name}</td>
+            <td class="py-2.5 px-2 font-bold tabular-nums text-slate-200">${priceStr}</td>
+            <td class="py-2.5 px-2 font-extrabold tabular-nums ${pCls}">${fmtPct(a.chg)}</td>
+            <td class="py-2.5 px-2 font-extrabold tabular-nums ${oiCls}">${fmtPct(a.oiChg)}</td>
+            <td class="py-2.5 px-2"><span class="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold border ${reg.cls}">${reg.label}</span></td>
+            <td class="py-2.5 px-2 whitespace-nowrap">${a.src === 'live-price'
+              ? `${provBadge('live')} <span class="text-[10px] text-slate-500">السعر فقط • OI ${provBadge('sim')}</span>`
+              : provBadge('sim')}</td>
+          </tr>`;
+        }).join('');
+
+        // Update Scatter Chart
+        if (scatterChart) {
+          scatterChart.data.datasets[0].data = state.oiAssets.map(a => ({ x: Number(a.oiChg.toFixed(2)), y: Number(a.chg.toFixed(2)), label: a.id }));
+          scatterChart.data.datasets[0].backgroundColor = state.oiAssets.map(a => {
+            const r = getOiRegime(a.chg, a.oiChg).code;
+            return r === 'longBuild' ? '#10b981' : r === 'shortSqueeze' ? '#f59e0b' : r === 'shortBuild' ? '#f97316' : r === 'flush' ? '#ef4444' : '#64748b';
+          });
+          scatterChart.update('none');
+        }
+      }
+
+      function renderPillars() {
+        const container = document.getElementById('pillarsContainer');
+        if (!container) return;
+
+        // Build once, update values thereafter
+        if (!container.dataset.built) {
+          container.innerHTML = [1, 2, 3].map(pNum => {
+            const pMeta = PILLAR_TITLES[pNum];
+            const items = INDICATORS_META.filter(i => i.pillar === pNum);
+            return `<div class="bg-[#090d16] border border-slate-800 rounded-2xl p-4 space-y-3.5">
+              <div class="text-xs font-black ${pMeta.color} border-b border-slate-800 pb-2">${pMeta.title}</div>
+              ${items.map(ind => `
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between text-xs gap-2">
+                    <span class="font-bold text-slate-200">${ind.name}</span>
+                    <span class="flex items-center gap-1.5 shrink-0">
+                      <span id="prov_${ind.id}"></span>
+                      <span id="val_${ind.id}" class="font-black tabular-nums text-cyan-300">${Math.round(state.values[ind.id])}</span>
+                    </span>
+                  </div>
+                  <input type="range" min="0" max="100" value="${state.values[ind.id]}" data-ind="${ind.id}" class="ind-slider w-full" />
+                </div>
+              `).join('')}
+            </div>`;
+          }).join('');
+          container.dataset.built = '1';
+
+          container.querySelectorAll('.ind-slider').forEach(sl => {
+            sl.addEventListener('input', (e) => {
+              const id = e.target.dataset.ind;
+              enterWhatIfMode('manual', 'وضع اختبار الضغط اليدوي (افتراضي)');
+              state.values[id] = Number(e.target.value);
+              renderAll();
+            });
+          });
+        }
+        INDICATORS_META.forEach(ind => {
+          const vEl = document.getElementById(`val_${ind.id}`);
+          const pEl = document.getElementById(`prov_${ind.id}`);
+          const sl = container.querySelector(`input[data-ind="${ind.id}"]`);
+          if (vEl) vEl.textContent = Math.round(state.values[ind.id]);
+          if (sl && document.activeElement !== sl) sl.value = Math.round(state.values[ind.id]);
+          if (pEl) {
+            const st = state.mode === 'live' ? provStatus(state.live.prov[ind.id], ind.freq) : 'manual';
+            pEl.innerHTML = provBadge(st);
+          }
+        });
+      }
+
+      // Switch to what-if mode WITHOUT mutating the live snapshot.
+      function enterWhatIfMode(modeName, tagText) {
+        if (state.mode === 'live') {
+          state.values = { ...state.live.values };
+          const c = state.regimeEngine.confirmedCode;
+          state.whatIfPrevCode = c;
+        }
+        state.mode = modeName;
+        document.getElementById('activeModeTag').textContent = tagText;
+        document.querySelectorAll('.scenario-btn').forEach(b => {
+          b.className = 'scenario-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer';
+        });
+      }
+
+      function enterLiveMode() {
+        state.mode = 'live';
+        state.values = state.live.values;
+        state.whatIfPrevCode = null;
+        document.getElementById('activeModeTag').textContent = 'وضع مباشر';
+        document.querySelectorAll('.scenario-btn').forEach(b => {
+          b.className = b.dataset.scenario === 'live'
+            ? 'scenario-btn px-3 py-1 rounded-lg text-xs font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 cursor-pointer'
+            : 'scenario-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer';
+        });
+      }
+
+      function renderSectors() {
+        const grid = document.getElementById('sectorsHeatmapGrid');
+        if (!grid) return;
+
+        const cyc = state.sectors.filter(s => s.type === 'cyc');
+        const def = state.sectors.filter(s => s.type === 'def');
+        const avgCyc = cyc.reduce((s, x) => s + x.perf, 0) / cyc.length;
+        const avgDef = def.reduce((s, x) => s + x.perf, 0) / def.length;
+        const spread = avgCyc - avgDef;
+
+        const summaryEl = document.getElementById('sectorRotationSummary');
+        if (summaryEl) {
+          summaryEl.innerHTML = `الدوري: <span class="${avgCyc >= 0 ? 'text-emerald-400' : 'text-rose-400'} tabular-nums">${fmtPct(avgCyc)}</span> | الدفاعي: <span class="${avgDef >= 0 ? 'text-emerald-400' : 'text-rose-400'} tabular-nums">${fmtPct(avgDef)}</span> | الفارق: <span class="text-cyan-300 tabular-nums">${fmtPct(spread)}</span>`;
+        }
+
+        grid.innerHTML = state.sectors.map(sec => {
+          const isPos = sec.perf >= 0;
+          const isAnom = Math.abs(sec.perf) >= 1.6;
+          const bg = isPos ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30';
+          const txt = isPos ? 'text-emerald-400' : 'text-rose-400';
+          return `<div class="relative rounded-xl p-3 border ${bg} flex flex-col justify-between gap-1">
+            ${isAnom ? `<span class="absolute top-2 left-2 w-2.5 h-2.5 rounded-full ${isPos ? 'bg-emerald-400' : 'bg-rose-500'} animate-ping"></span>` : ''}
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="font-black text-slate-300">${sec.code}</span>
+              <span class="text-slate-400">${sec.type === 'cyc' ? 'دوري' : 'دفاعي'}</span>
+            </div>
+            <div class="text-xs font-extrabold text-white truncate">${sec.name}</div>
+            <div class="text-sm font-black tabular-nums ${txt}">${fmtPct(sec.perf)}</div>
+          </div>`;
+        }).join('');
+
+        return { avgCyc, avgDef, spread };
+      }
+
+      // -----------------------------------------------------------------------
+      // 6. FULL REPORT (6 CARDS + INLINE TAGS) & EXECUTIVE BRIEF
+      // -----------------------------------------------------------------------
+      function updateFullReportAndBrief(m, decision, sectorStats) {
+        const risk = getRiskMeta(m.composite);
+        const sortedSectors = [...state.sectors].sort((a, b) => b.perf - a.perf);
+        const topSectors = sortedSectors.slice(0, 3).map(s => `${s.name} (${s.code}: ${fmtPct(s.perf)})`).join('، ');
+        const weakSectors = sortedSectors.slice(-3).reverse().map(s => `${s.name} (${s.code}: ${fmtPct(s.perf)})`).join('، ');
+
+        const gc = state.oiAssets.find(a => a.id === 'GC');
+        const si = state.oiAssets.find(a => a.id === 'SI');
+        const cl = state.oiAssets.find(a => a.id === 'CL');
+        const hg = state.oiAssets.find(a => a.id === 'HG');
+        const btc = state.oiAssets.find(a => a.id === 'BTC');
+        const eth = state.oiAssets.find(a => a.id === 'ETH');
+        const es = state.oiAssets.find(a => a.id === 'ES');
+
+        const raw = getRawReadings();
+        const netLiqB = raw.netLiqB;
+        const hygOasNum = raw.hygOas;
+        const dxyNum = raw.dxy;
+        const vixNum = raw.vix;
+        const sofrBp = raw.sofrBp;
+        const curveBps = raw.curveBps;
+        const d50 = raw.d50;
+        const d200 = raw.d200;
+        const skewNum = raw.skew;
+        const pcrNum = raw.pcr;
+        const flowsB = raw.flowsB;
+        // Every copied/quoted text is stamped when it is not built from decision-grade data.
+        const plainStamp = state.mode !== 'live'
+          ? '[افتراضي — اختبار ضغط، ليس قراءة سوق] '
+          : (!raw.isLive ? '[محاكاة — غير صالح للقرار] ' : '');
+
+        const tComp = mkTag(`${risk.badge} • ${risk.title}`, risk.tone);
+        const tSys = evalScoreTag(m.systemicStress, 'منضبط • إيجابي ومطمئن', 'متوسط • مراقبة حذرة', 'مرتفع • سلبي / ضغط نظامي');
+        const tVal = evalScoreTag(m.valuationStress, 'هادئ • إيجابي', 'متوسط • حذر انتقائي', 'تقلب حاد • سلبي');
+        const tNetLiq = netLiqB >= 20 ? mkTag('ضخ سيولة • إيجابي', 'pos') : netLiqB >= -30 ? mkTag('توازن سيولة • محايد', 'neu') : mkTag('سحب سيولة حاد • سلبي', 'neg');
+        const tHyg = hygOasNum <= 3.8 ? mkTag('منخفض ومستقر • إيجابي', 'pos') : hygOasNum <= 4.7 ? mkTag('معتدل إلى مرتفع نسبياً • حذر', 'neu') : mkTag('مرتفع وضاغط • سلبي / تحذير ائتماني', 'neg');
+        const tDxy = dxyNum <= 102 ? mkTag('هادئ وداعم للأسواق • إيجابي', 'pos') : dxyNum <= 105.5 ? mkTag('معتدل • محايد', 'neu') : mkTag('مرتفع وضاغط • سلبي', 'neg');
+        const tVix = vixNum < 18 ? mkTag('هادئ ومطمئن • إيجابي', 'pos') : vixNum < 24 ? mkTag('متوسط • حذر انتقائي', 'neu') : mkTag('مرتفع • سلبي / تقلب حاد', 'neg');
+        const tSofr = sofrBp <= 2 ? mkTag('تمويل مصرفي سلس • إيجابي', 'pos') : sofrBp <= 10 ? mkTag('تشدد طفيف • حذر', 'neu') : mkTag('اختناق تمويلي في الريبو • سلبي', 'neg');
+        const tCurve = evalScoreTag(state.values.yieldCurve, 'عوائد هادئة • إيجابي', 'تذبذب معتدل • محايد', 'تسارع مقلق بالعوائد • سلبي');
+        const tFlows = flowsB >= 3 ? mkTag('تدفقات مؤسسية داخلة • إيجابي', 'pos') : flowsB >= -6 ? mkTag('إعادة توازن روتينية • محايد', 'neu') : mkTag('تخارج واستردادات • سلبي', 'neg');
+        const tBreadth = d50 >= 60 ? mkTag('مشاركة واسعة وصحية • إيجابي', 'pos') : d50 >= 40 ? mkTag('اتساع متوسط • حذر', 'neu') : mkTag('ضعف داخلي وتباعد • سلبي', 'neg');
+        const tSkew = (skewNum < 132 && pcrNum < 0.9) ? mkTag('تحوط طبيعي منخفض • إيجابي', 'pos') : (skewNum < 145 && pcrNum < 1.05) ? mkTag('طلب تحوط متوازن • محايد', 'neu') : mkTag('تحوط مرتفع ضد الهبوط • سلبي / حذر', 'neg');
+        const tGc = evalAssetOiTag(gc);
+        const tCl = evalAssetOiTag(cl);
+        const tBtc = evalAssetOiTag(btc);
+        const tEs = evalAssetOiTag(es);
+        const tSecSpread = sectorStats.spread >= 0.35 ? mkTag('تدوير صعودي داعم • إيجابي', 'pos') : sectorStats.spread <= -0.35 ? mkTag('هروب للدفاعي • سلبي / حذر', 'neg') : mkTag('تدوير متوازن • محايد', 'neu');
+        const tDecision = decision.code === 'invalid' ? mkTag('لا يوجد حكم • بيانات غير صالحة', 'neu') : decision.code === 'expansion' ? mkTag('بيئة شراء وتوسع • إيجابي', 'pos') : decision.code === 'valuationDip' ? mkTag('قاع تجميعي محتمل • حذر إيجابي', 'neu') : mkTag('احتمال فخ هبوطي • سلبي / حماية الكاش', 'neg');
+
+        document.getElementById('reportTimestampMeta').textContent =
+          `آخر توليد ${getTimeStr()} | المؤشر المركب: ${m.composite}/100 (${risk.title}) | البيانات: ${state.mode !== 'live' ? 'افتراضية (اختبار ضغط)' : raw.isLive ? 'حقيقية' : 'محاكاة'}`;
+
+        const setPart = (idx, title, htmlContent, plainContent) => {
+          const el = document.getElementById(`reportPart${idx}`);
+          if (el) el.innerHTML = htmlContent;
+          state.reportParts[idx] = { title, plain: plainStamp + plainContent };
+        };
+
+        const p1Tail = m.systemicStress >= 60
+          ? 'هذا التزامن يثبت انتقال التوتر إلى قنوات التمويل والائتمان، ما يجعل أي ارتداد سريع عرضة للتحول إلى فخ هبوطي.'
+          : 'وبقاء الائتمان والتمويل المصرفي ضمن الحدود المنضبطة يميز التراجعات الحالية عن أزمات السيولة النظامية.';
+
+        setPart(1, 'التشخيص الكلي للسيولة ومخاطر الائتمان',
+          `يسجل مؤشر الإنذار المبكر المركب <strong class="tabular-nums text-white">${m.composite} من 100</strong> ${tComp.html}. ويبلغ ضغط السيولة والتمويل النظامي <strong class="tabular-nums text-white">${m.systemicStress}%</strong> ${tSys.html} مقابل ضغط التقلب والتقييمات <strong class="tabular-nums text-white">${m.valuationStress}%</strong> ${tVal.html}. ${p1Tail}`,
+          `يسجل مؤشر الإنذار المبكر المركب ${m.composite} من 100 ${tComp.plain}. ويبلغ ضغط السيولة والتمويل النظامي ${m.systemicStress}% ${tSys.plain} مقابل ضغط التقلب والتقييمات ${m.valuationStress}% ${tVal.plain}. ${p1Tail}`
+        );
+
+        const liqStr = `${netLiqB >= 0 ? '+' : ''}${netLiqB} مليار دولار`;
+        setPart(2, 'قراءة المؤشرات القيادية (السيولة، السندات، الدولار، والتقلب)',
+          `تُظهر قراءة صافي سيولة الخزانة (TGA/RRP) تغيراً بحدود <strong class="tabular-nums text-white">${liqStr}</strong> ${tNetLiq.html}، بينما تقف فوارق السندات عالية العائد (HY OAS) عند <strong class="tabular-nums text-white">${hygOasNum.toFixed(2)}%</strong> ${tHyg.html}، ومؤشر الدولار (DXY) عند <strong class="tabular-nums text-white">${dxyNum.toFixed(2)}</strong> ${tDxy.html}، ومؤشر الخوف (VIX) عند <strong class="tabular-nums text-white">${vixNum.toFixed(2)}</strong> ${tVix.html}.`,
+          `تُظهر قراءة صافي سيولة الخزانة (TGA/RRP) تغيراً بحدود ${liqStr} ${tNetLiq.plain}، بينما تقف فوارق السندات عالية العائد (HY OAS) عند ${hygOasNum.toFixed(2)}% ${tHyg.plain}، ومؤشر الدولار (DXY) عند ${dxyNum.toFixed(2)} ${tDxy.plain}، ومؤشر الخوف (VIX) عند ${vixNum.toFixed(2)} ${tVix.plain}.`
+        );
+
+        const sofrStr = `${sofrBp >= 0 ? '+' : ''}${sofrBp} نقطة أساس`;
+        const curveStr = `${curveBps >= 0 ? '+' : ''}${curveBps} نقطة أساس`;
+        const flowsStr = `${flowsB >= 0 ? '+' : ''}${flowsB} مليار دولار`;
+        setPart(3, 'صحة السوق الداخلية والتمويل المصرفي والتحوط',
+          `يسجل فارق التمويل المصرفي والريبو (SOFR-IORB) نحو <strong class="tabular-nums text-white">${sofrStr}</strong> ${tSofr.html}، ومنحنى العوائد (2s10s) عند <strong class="tabular-nums text-white">${curveStr}</strong> ${tCurve.html}، فيما تبلغ تدفقات الصناديق والتقاعد <strong class="tabular-nums text-white">${flowsStr}</strong> ${tFlows.html}. وداخلياً يبلغ اتساع السوق فوق متوسط 50 و200 يوم <strong class="tabular-nums text-white">${d50}% / ${d200}%</strong> ${tBreadth.html}، مع مؤشر الذيل SKEW عند <strong class="tabular-nums text-white">${skewNum}</strong> ونسبة Put/Call عند <strong class="tabular-nums text-white">${pcrNum.toFixed(2)}</strong> ${tSkew.html}.`,
+          `يسجل فارق التمويل المصرفي والريبو (SOFR-IORB) نحو ${sofrStr} ${tSofr.plain}، ومنحنى العوائد (2s10s) عند ${curveStr} ${tCurve.plain}، فيما تبلغ تدفقات الصناديق والتقاعد ${flowsStr} ${tFlows.plain}. وداخلياً يبلغ اتساع السوق فوق متوسط 50 و200 يوم ${d50}% / ${d200}% ${tBreadth.plain}، مع مؤشر الذيل SKEW عند ${skewNum} ونسبة Put/Call عند ${pcrNum.toFixed(2)} ${tSkew.plain}.`
+        );
+
+        setPart(4, 'قراءة العقود المفتوحة (Open Interest) للسلع والذهب والكريبتو',
+          `بمتوسط تغيّر عقود مفتوحة <strong class="tabular-nums text-white">${fmtPct(m.avgOiChg)}</strong> عبر الأصول التسعة: يسجل الذهب (GC) سعراً عند <strong class="tabular-nums text-white">$${gc.price.toFixed(2)}</strong> مع OI بنسبة <strong class="tabular-nums text-white">${fmtPct(gc.oiChg)}</strong> ${tGc.html}، والنفط الخام (CL) عند <strong class="tabular-nums text-white">$${cl.price.toFixed(2)}</strong> مع OI <strong class="tabular-nums text-white">${fmtPct(cl.oiChg)}</strong> ${tCl.html} (الفضة SI: ${fmtPct(si.oiChg)} | النحاس HG: ${fmtPct(hg.oiChg)}). أما البيتكوين (BTC) فعند <strong class="tabular-nums text-white">$${Math.round(btc.price).toLocaleString('en-US')}</strong> مع OI <strong class="tabular-nums text-white">${fmtPct(btc.oiChg)}</strong> ${tBtc.html} (وETH: ${fmtPct(eth.oiChg)})، ومؤشر S&P 500 (ES) مع OI <strong class="tabular-nums text-white">${fmtPct(es.oiChg)}</strong> ${tEs.html}.`,
+          `بمتوسط تغيّر عقود مفتوحة ${fmtPct(m.avgOiChg)} عبر الأصول التسعة: يسجل الذهب (GC) سعراً عند $${gc.price.toFixed(2)} مع OI بنسبة ${fmtPct(gc.oiChg)} ${tGc.plain}، والنفط الخام (CL) عند $${cl.price.toFixed(2)} مع OI ${fmtPct(cl.oiChg)} ${tCl.plain} (الفضة SI: ${fmtPct(si.oiChg)} | النحاس HG: ${fmtPct(hg.oiChg)}). أما البيتكوين (BTC) فعند $${Math.round(btc.price).toLocaleString('en-US')} مع OI ${fmtPct(btc.oiChg)} ${tBtc.plain} (وETH: ${fmtPct(eth.oiChg)})، ومؤشر S&P 500 (ES) مع OI ${fmtPct(es.oiChg)} ${tEs.plain}.`
+        );
+
+        const anomHtml = state.alertLog.length > 0
+          ? `ورصد رادار الشذوذ <strong class="text-white">${state.alertLog.length} تنبيهاً</strong>، أحدثها: «${state.alertLog[0].asset} — ${state.alertLog[0].shortReason}» ${mkTag(state.alertLog[0].type === 'danger' ? 'إنذار خطر • سلبي' : 'اختراق إيجابي • داعم', state.alertLog[0].type === 'danger' ? 'neg' : 'pos').html}.`
+          : `ولم يسجل رادار الشذوذ أي تحرك غير طبيعي حاد خارج النطاق في هذه اللحظة ${mkTag('استقرار لحظي • إيجابي', 'pos').html}.`;
+        const anomPlain = state.alertLog.length > 0
+          ? `ورصد رادار الشذوذ ${state.alertLog.length} تنبيهاً، أحدثها: «${state.alertLog[0].asset} — ${state.alertLog[0].shortReason}» (${state.alertLog[0].type === 'danger' ? 'إنذار خطر • سلبي' : 'اختراق إيجابي • داعم'}).`
+          : `ولم يسجل رادار الشذوذ أي تحرك غير طبيعي حاد خارج النطاق في هذه اللحظة (استقرار لحظي • إيجابي).`;
+
+        setPart(5, 'خريطة قطاعات الأسهم الـ 11 ورادار التنبيهات العاجلة',
+          `يبلغ الفارق بين القطاعات الدورية (<strong class="tabular-nums text-white">${fmtPct(sectorStats.avgCyc)}</strong>) والدفاعية (<strong class="tabular-nums text-white">${fmtPct(sectorStats.avgDef)}</strong>) نحو <strong class="tabular-nums text-white">${fmtPct(sectorStats.spread)}</strong> ${tSecSpread.html}. تتصدر المشهد قطاعات: ${topSectors}، بينما تتراجع قطاعات: ${weakSectors}. ${anomHtml}`,
+          `يبلغ الفارق بين القطاعات الدورية (${fmtPct(sectorStats.avgCyc)}) والدفاعية (${fmtPct(sectorStats.avgDef)}) نحو ${fmtPct(sectorStats.spread)} ${tSecSpread.plain}. تتصدر المشهد قطاعات: ${topSectors}، بينما تتراجع قطاعات: ${weakSectors}. ${anomPlain}`
+        );
+
+        setPart(6, 'الخلاصة التشغيلية وخطة اتخاذ القرار',
+          `التوصيف القيادي الحالي هو: <strong class="text-white">${decision.title}</strong> ${tDecision.html}. تقترح المنصة الاحتفاظ بنسبة كاش تتراوح بين <strong class="tabular-nums text-white">${decision.cashPct}</strong> مع تفعيل <strong class="text-white">${decision.hedgeTitle}</strong>. مصفوفة الإذن الفوري: الأسهم (${decision.permEquities.text})، الذهب (${decision.permGold.text})، الكريبتو (${decision.permCrypto.text})، والسندات السيادية (${decision.permBonds.text}).`,
+          `التوصيف القيادي الحالي هو: ${decision.title} ${tDecision.plain}. تقترح المنصة الاحتفاظ بنسبة كاش تتراوح بين ${decision.cashPct} مع تفعيل ${decision.hedgeTitle}. مصفوفة الإذن الفوري: الأسهم (${decision.permEquities.text})، الذهب (${decision.permGold.text})، الكريبتو (${decision.permCrypto.text})، والسندات السيادية (${decision.permBonds.text}).`
+        );
+
+        // Executive Brief
+        const pill = document.getElementById('execVerdictPill');
+        pill.className = `inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold border ${risk.bg} ${risk.text} ${risk.border}`;
+        document.getElementById('execVerdictDot').className = `w-2.5 h-2.5 rounded-full ${risk.bar}`;
+        document.getElementById('execVerdictText').textContent = `نطاق المخاطر: ${m.composite}/100 — ${risk.title}`;
+
+        const setExecBadge = (id, label, tone) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.textContent = label;
+          el.className = `inline-tag ${tone === 'pos' ? 'tag-pos' : tone === 'neg' ? 'tag-neg' : 'tag-neu'}`;
+        };
+
+        setExecBadge('execBadge1', tDecision.tone === 'pos' ? 'إيجابي' : tDecision.tone === 'neg' ? 'سلبي' : 'حذر', tDecision.tone);
+        setExecBadge('execBadge2', tSys.tone === 'pos' ? 'إيجابي' : tSys.tone === 'neg' ? 'سلبي' : 'محايد', tSys.tone);
+        setExecBadge('execBadge3', m.flushCount >= 3 ? 'سلبي' : m.longBuildCount >= 4 ? 'إيجابي' : 'محايد', m.flushCount >= 3 ? 'neg' : m.longBuildCount >= 4 ? 'pos' : 'neu');
+        setExecBadge('execBadge4', decision.code === 'invalid' ? 'معلّق' : decision.code === 'crisis' ? 'دفاعي' : 'انضباط', decision.code === 'invalid' ? 'neu' : decision.code === 'crisis' ? 'neg' : 'pos');
+
+        const c1 = decision.code === 'invalid'
+          ? `${decision.title} — لا إجابة على سؤال "قاع أم فخ؟" قبل توفر بيانات حقيقية.`
+          : `${decision.title} — الإجابة: ${decision.code === 'crisis' || decision.code === 'earlyStress' ? 'احتمال فخ هبوطي مرتفع (الأولوية لحماية الكاش).' : 'بيئة مناسبة للتجميع المنضبط دون أزمة ائتمان.'}`;
+        const c2 = `ضغط السيولة والائتمان ${m.systemicStress}% ${tSys.plain} | HY OAS عند ${hygOasNum.toFixed(2)}% | DXY عند ${dxyNum.toFixed(2)}.`;
+        const c3 = `${decision.oiHealthTitle} — الذهب OI ${fmtPct(gc.oiChg)} | النفط OI ${fmtPct(cl.oiChg)} | BTC OI ${fmtPct(btc.oiChg)}.`;
+        const c4 = `نسبة الكاش المستهدفة ${decision.cashPct} | التحوط: ${decision.hedgeTitle} | السندات: ${decision.permBonds.text}.`;
+
+        document.getElementById('execCardVerdict').textContent = c1;
+        document.getElementById('execCardLiquidity').textContent = c2;
+        document.getElementById('execCardOi').textContent = c3;
+        document.getElementById('execCardPriority').textContent = c4;
+
+        state.execBriefPlain = (plainStamp ? plainStamp.trim() + '\n' : '') + [
+          `1. الحكم النهائي: ${c1}`,
+          `2. وضع السيولة والائتمان: ${c2}`,
+          `3. بوصلة الأصول والـ OI: ${c3}`,
+          `4. القاعدة الذهبية: ${c4}`
+        ].join('\n');
+
+        // Rules come from the SAME decision object as cash % and hedge (single source of truth).
+        const rules = decision.rules;
+
+        document.getElementById('execRulesList').innerHTML = rules.map(r => `<li>${r}</li>`).join('');
+      }
+
+      // -----------------------------------------------------------------------
+      // 7. ANOMALY RADAR & EMAIL ENGINE
+      // -----------------------------------------------------------------------
+      function playBeep(isDanger) {
+        if (!state.alertConfig.sound) return;
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = isDanger ? 'sawtooth' : 'sine';
+          osc.frequency.value = isDanger ? 520 : 880;
+          gain.gain.setValueAtTime(0.08, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.26);
+        } catch (_) {}
+      }
+
+      // opts.key: explicit cooldown key (e.g. 'regime_crisis') | opts.bypassCooldown: escalations always pass
+      function triggerAlert(type, asset, shortReason, detail, opts = {}) {
+        const now = Date.now();
+        const key = opts.key || `${type}_${asset}`;
+        const cdMs = (state.alertConfig.cooldownMin || 10) * 60 * 1000;
+        if (!opts.bypassCooldown && state.cooldownMap[key] && (now - state.cooldownMap[key] < cdMs)) return;
+        state.cooldownMap[key] = now;
+
+        const alertObj = {
+          id: now,
+          time: getTimeStr(),
+          type,
+          asset,
+          shortReason,
+          detail,
+          subject: `[غرفة العمليات] ${type === 'danger' ? 'إنذار خطر عاجل' : 'إيجابية واختراق مفاجئ'}: ${asset}`,
+          body: `تنبيه آلي من غرفة العمليات المؤسسية\nالتوقيت: ${getDateTimeStamp()}\nالأصل / القطاع: ${asset}\nالتشخيص: ${shortReason}\nالتفاصيل: ${detail}`
+        };
+
+        state.alertLog.unshift(alertObj);
+        if (state.alertLog.length > 25) state.alertLog.pop();
+        document.getElementById('headerAlertCount').textContent = state.alertLog.length;
+
+        playBeep(type === 'danger');
+        renderAlertLog();
+
+        // Dispatch Webhook if configured
+        if (state.alertConfig.method === 'webhook' && state.alertConfig.webhookUrl) {
+          fetch(state.alertConfig.webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(alertObj)
+          }).catch(() => {});
+        }
+      }
+
+      function renderAlertLog() {
+        const box = document.getElementById('alertLogContainer');
+        if (!box) return;
+        if (state.alertLog.length === 0) return;
+
+        box.innerHTML = state.alertLog.map(a => {
+          const isD = a.type === 'danger';
+          const cls = isD ? 'border-rose-500/35 bg-rose-500/10' : 'border-emerald-500/35 bg-emerald-500/10';
+          const badge = isD ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-300';
+          return `<div class="rounded-xl p-3 border ${cls} flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <div class="space-y-0.5">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${badge}">${isD ? 'خطر عاجل' : 'اختراق إيجابي'}</span>
+                <strong class="text-white">${a.asset}</strong>
+                <span class="text-slate-400 tabular-nums">${a.time}</span>
+              </div>
+              <div class="text-slate-200 font-semibold">${a.shortReason} — <span class="text-slate-400 font-normal">${a.detail}</span></div>
+            </div>
+            <button type="button" data-preview-id="${a.id}" class="preview-alert-btn shrink-0 px-2.5 py-1 rounded-lg bg-[#090d16] hover:bg-slate-800 text-cyan-300 border border-slate-700 font-bold cursor-pointer">
+              معاينة الإيميل
+            </button>
+          </div>`;
+        }).join('');
+
+        box.querySelectorAll('.preview-alert-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const found = state.alertLog.find(x => x.id === Number(btn.dataset.previewId));
+            if (found) openEmailPreview(found);
+          });
+        });
+      }
+
+      function openEmailPreview(alertObj) {
+        state.activePreviewAlert = alertObj;
+        document.getElementById('previewSubject').textContent = alertObj.subject;
+        document.getElementById('previewBody').textContent = alertObj.body;
+        const m = document.getElementById('emailPreviewModal');
+        m.classList.remove('hidden');
+        m.classList.add('flex');
+      }
+
+      // -----------------------------------------------------------------------
+      // 8. CHARTS INITIALIZATION & LIVE TICK ENGINE
+      // -----------------------------------------------------------------------
+      function initCharts() {
+        if (typeof Chart === 'undefined') return;
+
+        // Live Trend Chart
+        const tCtx = document.getElementById('liveTrendChart');
+        if (tCtx) {
+          trendChart = new Chart(tCtx, {
+            type: 'line',
+            data: {
+              labels: state.trendHistory.labels,
+              datasets: [{
+                label: 'مؤشر الإنذار المبكر',
+                data: state.trendHistory.scores,
+                borderColor: '#38bdf8',
+                backgroundColor: 'rgba(56, 189, 248, 0.14)',
+                borderWidth: 2.5,
+                fill: true,
+                tension: 0.35,
+                pointRadius: 2.5
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#1e293b' } },
+                y: { min: 0, max: 100, ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#1e293b' } }
+              }
+            }
+          });
+        }
+
+        // OI Scatter Chart
+        const sCtx = document.getElementById('oiScatterChart');
+        if (sCtx) {
+          scatterChart = new Chart(sCtx, {
+            type: 'scatter',
+            data: {
+              datasets: [{
+                label: 'الأصول',
+                data: [],
+                backgroundColor: [],
+                pointRadius: 6,
+                pointHoverRadius: 8
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label: (ctx) => `${ctx.raw.label}: OI ${ctx.raw.x}% | السعر ${ctx.raw.y}%`
+                  }
+                }
+              },
+              scales: {
+                x: { title: { display: true, text: 'تغيّر OI %', color: '#94a3b8', font: { size: 10 } }, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
+                y: { title: { display: true, text: 'تغيّر السعر %', color: '#94a3b8', font: { size: 10 } }, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+              }
+            }
+          });
+        }
+      }
+
+      // NOTE (Phase 1): the random-walk "live tick" was removed. Nothing changes unless a real
+      // source changes it. Phase 2 will feed macro data through ingestObservation().
+
+      // opts: { newObservation?: bool, scenarioClick?: bool }
+      function renderAll(opts = {}) {
+        const m = computeMetrics();
+        const evalResult = evaluateRegimeTransition(m, opts);
+        const decision = computeDecision(evalResult.confirmedCode);
+
+        renderTicker();
+        renderDecisionCenter(m, decision, evalResult);
+        renderOiMatrix();
+        renderPillars();
+        const sectorStats = renderSectors();
+        updateFullReportAndBrief(m, decision, sectorStats);
+
+        // Trend chart records ONLY real observations in live mode (no slider/render noise).
+        if (opts.newObservation && state.mode === 'live') {
+          state.trendHistory.labels.push(getTimeStr());
+          state.trendHistory.scores.push(m.composite);
+          if (state.trendHistory.labels.length > 60) {
+            state.trendHistory.labels.shift();
+            state.trendHistory.scores.shift();
+          }
+          if (trendChart) trendChart.update('none');
+        }
+        const note = document.getElementById('trendNote');
+        if (note) {
+          note.textContent = state.trendHistory.scores.length === 0
+            ? 'لا توجد قراءات حقيقية بعد — يُسجَّل المسار فقط عند وصول قراءة حقيقية جديدة'
+            : `${state.trendHistory.scores.length} قراءة حقيقية مسجلة`;
+        }
+      }
+
+      function startLoop() {
+        if (state.timerId) clearInterval(state.timerId);
+        if (state.intervalMs > 0) {
+          state.timerId = setInterval(async () => {
+            await probeLiveCryptoApis();   // real crypto prices only; no synthetic drift
+            renderAll();
+          }, state.intervalMs);
+        }
+      }
+
+      // -----------------------------------------------------------------------
+      // 9. EVENT LISTENERS & BOOTSTRAP
+      // -----------------------------------------------------------------------
+      function loadAlertConfig() {
+        try {
+          const saved = localStorage.getItem('inst_alert_cfg_v2');
+          if (saved) Object.assign(state.alertConfig, JSON.parse(saved));
+        } catch (_) {}
+        const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+        setVal('cfgEmail', state.alertConfig.email || '');
+        if (state.alertConfig.method === 'emailjs') state.alertConfig.method = 'mailto'; // removed option
+        setVal('cfgMethod', state.alertConfig.method || 'mailto');
+        setVal('cfgWebhookUrl', state.alertConfig.webhookUrl || '');
+        setVal('cfgCooldown', state.alertConfig.cooldownMin || 10);
+        const soundEl = document.getElementById('cfgSound');
+        if (soundEl) soundEl.checked = state.alertConfig.sound !== false;
+        toggleMethodFields();
+      }
+
+      function toggleMethodFields() {
+        const methodEl = document.getElementById('cfgMethod');
+        const whEl = document.getElementById('webhookFields');
+        if (!methodEl || !whEl) return;
+        whEl.classList.toggle('hidden', methodEl.value !== 'webhook');
+      }
+
+      function bindEvents() {
+        // Reconnect
+        document.getElementById('reconnectBtn').addEventListener('click', async () => {
+          showToast('جاري فحص مصادر البث المباشر...');
+          await probeLiveCryptoApis();
+          renderAll();
+        });
+
+        // Interval
+        document.getElementById('intervalSelect').addEventListener('change', (e) => {
+          state.intervalMs = Number(e.target.value);
+          startLoop();
+          showToast(state.intervalMs === 0 ? 'تم إيقاف التحديث التلقائي مؤقتاً' : `تم ضبط التحديث كل ${state.intervalMs / 1000} ثوانٍ`);
+        });
+
+        // Scenarios
+        document.querySelectorAll('.scenario-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const sc = btn.dataset.scenario;
+            if (sc === 'live') {
+              enterLiveMode();
+              renderAll();
+            } else {
+              enterWhatIfMode(sc, `سيناريو افتراضي: ${SCENARIOS[sc].label}`);
+              btn.className = 'scenario-btn px-3 py-1 rounded-lg text-xs font-extrabold bg-violet-500/20 text-violet-300 border border-violet-500/40 cursor-pointer';
+              state.values = { ...SCENARIOS[sc].values };
+              renderAll({ scenarioClick: true });
+            }
+          });
+        });
+
+        // Auto-Popup Toggle & Regime Popup Actions
+        const autoToggle = document.getElementById('autoPopupToggle');
+        if (autoToggle) {
+          autoToggle.addEventListener('change', (e) => {
+            state.regimeEngine.autoPopup = e.target.checked;
+            showToast(e.target.checked ? 'تم تفعيل نافذة تأكيد التحول التلقائية' : 'تم إيقاف نافذة تأكيد التحول التلقائية');
+          });
+        }
+
+        document.getElementById('ackRegimeBtn').addEventListener('click', () => {
+          state.regimeEngine.lastAckTime = getTimeStr();
+          const modal = document.getElementById('regimePopupModal');
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          const ackEl = document.getElementById('lastAckStamp');
+          if (ackEl) ackEl.textContent = `آخر استلام قرار: ${state.regimeEngine.lastAckTime}`;
+          showToast(`تم تأكيد واستلام القرار الساعة ${state.regimeEngine.lastAckTime} ✓`);
+        });
+
+        document.getElementById('copyRegimeShiftBtn').addEventListener('click', () => {
+          if (state.regimeEngine.lastTransitionText) {
+            copyTextFallback(state.regimeEngine.lastTransitionText, 'تم نسخ ملخص التحول النظامي ✓');
+          }
+        });
+
+        // Reset sliders
+        document.getElementById('resetSlidersBtn').addEventListener('click', () => {
+          enterLiveMode();   // live snapshot was never mutated by sliders, so this is a true reset
+          renderAll();
+          showToast('تمت العودة إلى الوضع المباشر');
+        });
+
+        // Per-Paragraph Copy & Quote Buttons
+        document.querySelectorAll('.copy-part-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const part = state.reportParts[Number(btn.dataset.copyPart)];
+            if (part) copyTextFallback(`${part.title}:\n${part.plain}`, 'تم نسخ الفقرة بنجاح ✓');
+          });
+        });
+        document.querySelectorAll('.quote-part-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const part = state.reportParts[Number(btn.dataset.quotePart)];
+            if (part) copyTextFallback(`❝ ${part.title}\n${part.plain}\n— غرفة العمليات المؤسسية | ${getDateTimeStamp()} ❞`, 'تم نسخ الاقتباس المنسّق ✓');
+          });
+        });
+
+        // Full Report Copy & Print
+        document.getElementById('copyReportBtn').addEventListener('click', () => {
+          const all = [1, 2, 3, 4, 5, 6].map(i => state.reportParts[i] ? `\n${i}) ${state.reportParts[i].title}:\n${state.reportParts[i].plain}` : '').join('\n');
+          copyTextFallback(`=== التقرير المؤسسي الكامل ===\n${all}\n\n=== الإيجاز التنفيذي ===\n${state.execBriefPlain}`, 'تم نسخ التقرير الكامل والإيجاز ✓');
+        });
+        document.getElementById('printReportBtn').addEventListener('click', () => window.print());
+
+        // Executive Brief Copy & Quote
+        document.getElementById('copyExecBriefBtn').addEventListener('click', () => {
+          copyTextFallback(`الإيجاز التنفيذي لاتخاذ القرار:\n${state.execBriefPlain}`, 'تم نسخ الإيجاز التنفيذي ✓');
+        });
+        document.getElementById('quoteExecBriefBtn').addEventListener('click', () => {
+          copyTextFallback(`❝ الإيجاز التنفيذي لاتخاذ القرار\n${state.execBriefPlain}\n— غرفة العمليات المؤسسية | ${getDateTimeStamp()} ❞`, 'تم نسخ اقتباس الإيجاز المنسّق ✓');
+        });
+
+        // Alert Simulation & Test Email
+        document.getElementById('simDangerBtn').addEventListener('click', () => {
+          triggerAlert('danger', '[تجربة] فوارق السندات HYG + VIX', 'قفزة مفاجئة في ضغط الائتمان والتقلب', 'تنبيه تجريبي لاختبار المسار — ليس حدثاً حقيقياً.');
+          showToast('تم رصد وتسجيل إنذار خطر تجريبي');
+        });
+        document.getElementById('simPositiveBtn').addEventListener('click', () => {
+          triggerAlert('positive', '[تجربة] الذهب (GC) + البيتكوين (BTC)', 'دخول سيولة شرائية قوية (Long Build)', 'تنبيه تجريبي لاختبار المسار — ليس حدثاً حقيقياً.');
+          showToast('تم رصد وتسجيل اختراق إيجابي تجريبي');
+        });
+        document.getElementById('testEmailBtn').addEventListener('click', () => {
+          const sample = {
+            subject: '[غرفة العمليات] رسالة اختبار نظام التنبيهات',
+            body: `هذه رسالة اختبار من غرفة العمليات المؤسسية.\nالتوقيت: ${getDateTimeStamp()}\nالحالة: النظام جاهز لرصد الشذوذ وإرسال الإشعارات الفورية.`
+          };
+          openEmailPreview(sample);
+        });
+
+        // Settings Modal
+        const modal = document.getElementById('alertSettingsModal');
+        document.getElementById('openAlertSettingsBtn').addEventListener('click', () => { modal.classList.remove('hidden'); modal.classList.add('flex'); });
+        document.getElementById('closeAlertSettingsBtn').addEventListener('click', () => { modal.classList.add('hidden'); modal.classList.remove('flex'); });
+        document.getElementById('cfgMethod').addEventListener('change', toggleMethodFields);
+        document.getElementById('saveAlertSettingsBtn').addEventListener('click', () => {
+          state.alertConfig = {
+            email: document.getElementById('cfgEmail').value.trim(),
+            method: document.getElementById('cfgMethod').value,
+            webhookUrl: document.getElementById('cfgWebhookUrl').value.trim(),
+            cooldownMin: Number(document.getElementById('cfgCooldown').value) || 10,
+            sound: document.getElementById('cfgSound').checked
+          };
+          try { localStorage.setItem('inst_alert_cfg_v2', JSON.stringify(state.alertConfig)); } catch (_) {}
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          showToast('تم حفظ إعدادات الإيميل والرادار ✓');
+        });
+
+        // Preview Modal
+        const pModal = document.getElementById('emailPreviewModal');
+        document.getElementById('closePreviewModalBtn').addEventListener('click', () => { pModal.classList.add('hidden'); pModal.classList.remove('flex'); });
+        document.getElementById('copyEmailPreviewBtn').addEventListener('click', () => {
+          if (state.activePreviewAlert) copyTextFallback(`${state.activePreviewAlert.subject}\n\n${state.activePreviewAlert.body}`, 'تم نسخ نص البريد ✓');
+        });
+        document.getElementById('sendMailtoNowBtn').addEventListener('click', () => {
+          if (!state.activePreviewAlert) return;
+          const to = encodeURIComponent(state.alertConfig.email || '');
+          const sub = encodeURIComponent(state.activePreviewAlert.subject);
+          const body = encodeURIComponent(state.activePreviewAlert.body);
+          window.location.href = `mailto:${to}?subject=${sub}&body=${body}`;
+        });
+      }
+
+      // Initialize Everything Cleanly on DOM Ready
+      window.addEventListener('DOMContentLoaded', async () => {
+        loadAlertConfig();
+        initCharts();
+        bindEvents();
+        enterLiveMode();
+        renderAll();
+        await probeLiveCryptoApis();
+        renderAll();
+        startLoop();
+      });
+    })();
+  </script>
+</body>
+</html>
