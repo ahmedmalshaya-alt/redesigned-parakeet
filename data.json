@@ -1,9 +1,17 @@
 {
  "schema": 1,
- "generated": "2026-11-21T22:40:32Z",
- "generatedTs": 1795300832310,
- "obsKey": "repoSofr:2026-11-19|dxy:2026-11-13|hygOas:2026-11-19|yieldCurve:2026-11-20|realYield:2026-11-19",
+ "generated": "2026-11-21T22:49:14Z",
+ "generatedTs": 1795301354484,
+ "obsKey": "netLiquidity:2026-11-18|repoSofr:2026-11-19|dxy:2026-11-13|hygOas:2026-11-19|yieldCurve:2026-11-20|realYield:2026-11-19",
  "indicators": {
+  "netLiquidity": {
+   "score": 44.6,
+   "date": "2026-11-18",
+   "ts": 1794960000000,
+   "source": "FRED",
+   "freq": "weekly",
+   "n": 156
+  },
   "repoSofr": {
    "score": 85.5,
    "date": "2026-11-19",
@@ -59,9 +67,27 @@
    "source": "CBOE",
    "freq": "daily",
    "n": 756
+  },
+  "breadth": {
+   "score": 0.3,
+   "date": "2026-11-20",
+   "ts": 1795132800000,
+   "source": "Yahoo",
+   "freq": "daily",
+   "n": 756
+  },
+  "crossAsset": {
+   "score": 1.7,
+   "date": "2026-11-21",
+   "ts": 1795219200000,
+   "source": "OKX",
+   "freq": "daily",
+   "n": 90
   }
  },
  "raw": {
+  "netLiqB": 23,
+  "netLiqLevelB": 5825,
   "sofrBp": 1.0,
   "dxy": 122.65,
   "dxyPct": 92.1,
@@ -69,30 +95,181 @@
   "curveBps": 29,
   "realYield": 2.88,
   "vix": 28.44,
-  "skew": 138.8
+  "skew": 138.8,
+  "rspSpyChg": 6.97
  },
  "assets": {
   "BTC": {
-   "price": 60154.0,
-   "chg": 1.61,
+   "price": 60115.0,
+   "chg": 1.54,
    "oiChg": null,
    "date": "2026-11-21",
-   "ts": 1795300832310,
+   "ts": 1795301354484,
    "source": "Hyperliquid",
    "oiSource": "Hyperliquid (24h)"
   },
   "ETH": {
-   "price": 1679.1,
-   "chg": 3.3,
+   "price": 1680.2,
+   "chg": 3.37,
    "oiChg": null,
    "date": "2026-11-21",
-   "ts": 1795300832310,
+   "ts": 1795301354484,
    "source": "Hyperliquid",
    "oiSource": "Hyperliquid (24h)"
+  },
+  "GC": {
+   "price": 3515.3999,
+   "chg": -4.62,
+   "date": "2026-11-20",
+   "ts": 1795132800000,
+   "source": "Yahoo",
+   "oiChg": 0.77,
+   "oiSource": "CFTC COT أسبوعي (2026-11-17)"
+  },
+  "SI": {
+   "price": 41.035,
+   "chg": -7.41,
+   "date": "2026-11-20",
+   "ts": 1795132800000,
+   "source": "Yahoo",
+   "oiChg": 6.31,
+   "oiSource": "CFTC COT أسبوعي (2026-11-17)"
+  },
+  "CL": {
+   "price": 83.98,
+   "chg": 0.93,
+   "date": "2026-11-20",
+   "ts": 1795132800000,
+   "source": "Yahoo",
+   "oiChg": -2.49,
+   "oiSource": "CFTC COT أسبوعي (2026-11-17)"
+  },
+  "HG": {
+   "price": 5.477,
+   "chg": -2.63,
+   "date": "2026-11-20",
+   "ts": 1795132800000,
+   "source": "Yahoo",
+   "oiChg": 0.28,
+   "oiSource": "CFTC COT أسبوعي (2026-11-17)"
+  },
+  "ES": {
+   "price": 6935.0,
+   "chg": -3.64,
+   "date": "2026-11-20",
+   "ts": 1795132800000,
+   "source": "Yahoo",
+   "oiChg": 3.93,
+   "oiSource": "CFTC COT أسبوعي (2026-11-17)"
+  },
+  "NQ": {
+   "price": 25126.5,
+   "chg": -5.54,
+   "date": "2026-11-20",
+   "ts": 1795132800000,
+   "source": "Yahoo",
+   "oiChg": 2.67,
+   "oiSource": "CFTC COT أسبوعي (2026-11-17)"
+  },
+  "ZN": {
+   "price": 106.8438,
+   "chg": 0.91,
+   "date": "2026-11-20",
+   "ts": 1795132800000,
+   "source": "Yahoo",
+   "oiChg": 2.5,
+   "oiSource": "CFTC COT أسبوعي (2026-11-17)"
   }
  },
- "sectors": {},
- "recent": [],
+ "sectors": {
+  "XLK": {
+   "perf": -7.27,
+   "date": "2026-11-20"
+  },
+  "XLF": {
+   "perf": -1.82,
+   "date": "2026-11-20"
+  },
+  "XLV": {
+   "perf": -0.12,
+   "date": "2026-11-20"
+  },
+  "XLE": {
+   "perf": -0.62,
+   "date": "2026-11-20"
+  },
+  "XLY": {
+   "perf": -2.95,
+   "date": "2026-11-20"
+  },
+  "XLP": {
+   "perf": 0.67,
+   "date": "2026-11-20"
+  },
+  "XLI": {
+   "perf": -3.09,
+   "date": "2026-11-20"
+  },
+  "XLU": {
+   "perf": -0.74,
+   "date": "2026-11-20"
+  },
+  "XLB": {
+   "perf": -2.19,
+   "date": "2026-11-20"
+  },
+  "XLRE": {
+   "perf": -0.98,
+   "date": "2026-11-20"
+  },
+  "XLC": {
+   "perf": -2.66,
+   "date": "2026-11-20"
+  }
+ },
+ "recent": [
+  {
+   "obsKey": "netLiquidity:2026-11-18|repoSofr:2026-11-19|dxy:2026-11-13|hygOas:2026-11-19|yieldCurve:2026-11-20|realYield:2026-11-19",
+   "ts": 1795301354484,
+   "values": {
+    "netLiquidity": 44.6,
+    "repoSofr": 85.5,
+    "dxy": 92.1,
+    "hygOas": 93.8,
+    "yieldCurve": 14.6,
+    "realYield": 98.3,
+    "vix": 97.6,
+    "skewPcr": 15.8,
+    "breadth": 0.3,
+    "crossAsset": 1.7
+   },
+   "prov": {
+    "netLiquidity": 1794960000000,
+    "repoSofr": 1795046400000,
+    "dxy": 1794528000000,
+    "hygOas": 1795046400000,
+    "yieldCurve": 1795132800000,
+    "realYield": 1795046400000,
+    "vix": 1795046400000,
+    "skewPcr": 1795132800000,
+    "breadth": 1795132800000,
+    "crossAsset": 1795219200000
+   },
+   "raw": {
+    "netLiqB": 23,
+    "netLiqLevelB": 5825,
+    "sofrBp": 1.0,
+    "dxy": 122.65,
+    "dxyPct": 92.1,
+    "hygOas": 3.52,
+    "curveBps": 29,
+    "realYield": 2.88,
+    "vix": 28.44,
+    "skew": 138.8,
+    "rspSpyChg": 6.97
+   }
+  }
+ ],
  "oiHistory": {
   "BTC": [
    [
@@ -103,6 +280,11 @@
    [
     1795300832310,
     37249.18278,
+    "Hyperliquid"
+   ],
+   [
+    1795301354484,
+    37148.5007600001,
     "Hyperliquid"
    ]
   ],
@@ -116,32 +298,17 @@
     1795300832310,
     617304.2719999999,
     "Hyperliquid"
+   ],
+   [
+    1795301354484,
+    617498.4535999999,
+    "Hyperliquid"
    ]
   ]
  },
  "errors": [
-  "netLiquidity: RuntimeError: net liquidity sanity check failed: ('2026-11-18', -909871.879)",
-  "breadth: RuntimeError: stooq rsp.us: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
   "bybit OI daily: HTTPError: HTTP Error 403: Forbidden",
-  "crossAsset: HTTPError: HTTP Error 451: ",
-  "bybit tickers: HTTPError: HTTP Error 403: Forbidden",
-  "stooq GC: RuntimeError: stooq gc.f: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "stooq SI: RuntimeError: stooq si.f: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "stooq CL: RuntimeError: stooq cl.f: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "stooq HG: RuntimeError: stooq hg.f: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "stooq ES: RuntimeError: stooq es.f: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "stooq NQ: RuntimeError: stooq nq.f: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "stooq ZN: RuntimeError: stooq zn.f: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "sector XLK: RuntimeError: stooq xlk.us: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "sector XLF: RuntimeError: stooq xlf.us: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "sector XLV: RuntimeError: stooq xlv.us: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "sector XLE: RuntimeError: stooq xle.us: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "sector XLY: RuntimeError: stooq xly.us: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "sector XLP: RuntimeError: stooq xlp.us: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "sector XLI: RuntimeError: stooq xli.us: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "sector XLU: RuntimeError: stooq xlu.us: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "sector XLB: RuntimeError: stooq xlb.us: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "sector XLRE: RuntimeError: stooq xlre.us: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')",
-  "sector XLC: RuntimeError: stooq xlc.us: no data ('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=')"
+  "crossAsset via bybit/binance: HTTPError: HTTP Error 451: ",
+  "bybit tickers: HTTPError: HTTP Error 403: Forbidden"
  ]
 }
