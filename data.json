@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated": "2026-11-21T22:49:14Z",
- "generatedTs": 1795301354484,
+ "generated": "2026-11-21T22:56:19Z",
+ "generatedTs": 1795301779404,
  "obsKey": "netLiquidity:2026-11-18|repoSofr:2026-11-19|dxy:2026-11-13|hygOas:2026-11-19|yieldCurve:2026-11-20|realYield:2026-11-19",
  "indicators": {
   "netLiquidity": {
@@ -101,19 +101,19 @@
  "assets": {
   "BTC": {
    "price": 60115.0,
-   "chg": 1.54,
+   "chg": 1.65,
    "oiChg": null,
    "date": "2026-11-21",
-   "ts": 1795301354484,
+   "ts": 1795301779404,
    "source": "Hyperliquid",
    "oiSource": "Hyperliquid (24h)"
   },
   "ETH": {
    "price": 1680.2,
-   "chg": 3.37,
+   "chg": 3.62,
    "oiChg": null,
    "date": "2026-11-21",
-   "ts": 1795301354484,
+   "ts": 1795301779404,
    "source": "Hyperliquid",
    "oiSource": "Hyperliquid (24h)"
   },
@@ -286,6 +286,11 @@
     1795301354484,
     37148.5007600001,
     "Hyperliquid"
+   ],
+   [
+    1795301779404,
+    37171.68782,
+    "Hyperliquid"
    ]
   ],
   "ETH": [
@@ -302,6 +307,11 @@
    [
     1795301354484,
     617498.4535999999,
+    "Hyperliquid"
+   ],
+   [
+    1795301779404,
+    621732.1193999996,
     "Hyperliquid"
    ]
   ]
