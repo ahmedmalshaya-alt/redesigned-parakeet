@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-21T22:59:23Z",
+ "generated": "2026-11-21T23:01:16Z",
  "panel": {
   "start": "2004-01-02",
   "end": "2026-11-20",
@@ -260,6 +260,14 @@
      "sharpe": 0.55,
      "maxdd": -33.72,
      "calmar": 0.3
+    },
+    "static_same_cash": {
+     "cagr": 7.47,
+     "vol": 13.95,
+     "sharpe": 0.59,
+     "maxdd": -22.78,
+     "calmar": 0.33,
+     "avg_cash_pct": 35.4
     }
    },
    "oos": {
@@ -276,6 +284,14 @@
      "sharpe": 1.15,
      "maxdd": -18.76,
      "calmar": 0.95
+    },
+    "static_same_cash": {
+     "cagr": 13.01,
+     "vol": 9.55,
+     "sharpe": 1.33,
+     "maxdd": -11.93,
+     "calmar": 1.09,
+     "avg_cash_pct": 37.2
     }
    },
    "full": {
@@ -292,6 +308,14 @@
      "sharpe": 0.62,
      "maxdd": -55.19,
      "calmar": 0.19
+    },
+    "static_same_cash": {
+     "cagr": 7.62,
+     "vol": 12.1,
+     "sharpe": 0.67,
+     "maxdd": -38.76,
+     "calmar": 0.2,
+     "avg_cash_pct": 35.0
     }
    }
   },
@@ -683,6 +707,14 @@
      "sharpe": 0.55,
      "maxdd": -33.72,
      "calmar": 0.3
+    },
+    "static_same_cash": {
+     "cagr": 7.28,
+     "vol": 13.45,
+     "sharpe": 0.59,
+     "maxdd": -22.02,
+     "calmar": 0.33,
+     "avg_cash_pct": 37.7
     }
    },
    "oos": {
@@ -699,6 +731,14 @@
      "sharpe": 1.15,
      "maxdd": -18.76,
      "calmar": 0.95
+    },
+    "static_same_cash": {
+     "cagr": 12.59,
+     "vol": 9.07,
+     "sharpe": 1.35,
+     "maxdd": -11.33,
+     "calmar": 1.11,
+     "avg_cash_pct": 40.4
     }
    },
    "full": {
@@ -715,6 +755,14 @@
      "sharpe": 0.62,
      "maxdd": -55.19,
      "calmar": 0.19
+    },
+    "static_same_cash": {
+     "cagr": 7.49,
+     "vol": 11.76,
+     "sharpe": 0.67,
+     "maxdd": -37.79,
+     "calmar": 0.2,
+     "avg_cash_pct": 36.9
     }
    }
   },
