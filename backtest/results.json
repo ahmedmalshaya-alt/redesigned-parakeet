@@ -1,9 +1,9 @@
 {
- "generated": "2026-11-21T22:57:12Z",
+ "generated": "2026-11-21T22:59:23Z",
  "panel": {
-  "start": "2004-01-01",
+  "start": "2004-01-02",
   "end": "2026-11-20",
-  "days": 276
+  "days": 5759
  },
  "lags_days": {
   "WALCL": 1,
@@ -40,207 +40,207 @@
   "dxp": 85
  },
  "best": {
-  "es": 55,
-  "sy": 60,
+  "es": 45,
+  "sy": 54,
   "cr": 70,
   "hy": 5.0,
   "sofr": 10,
   "nl": -150,
-  "vix": 35,
+  "vix": 25,
   "dxp": 85
  },
  "best_is": {
-  "calmar": 23.92,
-  "sharpe": 2.99,
-  "maxdd": -16.22,
-  "false_py": 0.21,
-  "score": 23.8885
+  "calmar": 0.39,
+  "sharpe": 0.65,
+  "maxdd": -20.45,
+  "false_py": 0.84,
+  "score": 0.264
  },
  "default_is": {
-  "calmar": 18.4,
-  "sharpe": 2.79,
-  "maxdd": -14.12,
-  "false_py": 0.0,
-  "score": 18.4
+  "calmar": 0.37,
+  "sharpe": 0.65,
+  "maxdd": -21.56,
+  "false_py": 1.9,
+  "score": 0.08500000000000002
  },
  "top10": [
   {
    "params": {
-    "es": 55,
-    "sy": 60,
+    "es": 45,
+    "sy": 54,
     "cr": 70,
     "hy": 5.0,
     "sofr": 10,
     "nl": -150,
-    "vix": 35,
+    "vix": 25,
     "dxp": 85
    },
-   "calmar": 23.92,
-   "sharpe": 2.99,
-   "maxdd": -16.22,
-   "false_py": 0.21,
-   "score": 23.8885
+   "calmar": 0.39,
+   "sharpe": 0.65,
+   "maxdd": -20.45,
+   "false_py": 0.84,
+   "score": 0.264
   },
   {
    "params": {
-    "es": 55,
-    "sy": 60,
+    "es": 45,
+    "sy": 54,
+    "cr": 70,
+    "hy": 5.0,
+    "sofr": 10,
+    "nl": -200,
+    "vix": 25,
+    "dxp": 85
+   },
+   "calmar": 0.39,
+   "sharpe": 0.65,
+   "maxdd": -20.45,
+   "false_py": 0.84,
+   "score": 0.264
+  },
+  {
+   "params": {
+    "es": 45,
+    "sy": 54,
+    "cr": 70,
+    "hy": 5.0,
+    "sofr": 10,
+    "nl": -300,
+    "vix": 25,
+    "dxp": 85
+   },
+   "calmar": 0.39,
+   "sharpe": 0.65,
+   "maxdd": -20.45,
+   "false_py": 0.84,
+   "score": 0.264
+  },
+  {
+   "params": {
+    "es": 45,
+    "sy": 54,
     "cr": 70,
     "hy": 5.0,
     "sofr": 15,
     "nl": -150,
-    "vix": 35,
+    "vix": 25,
     "dxp": 85
    },
-   "calmar": 23.92,
-   "sharpe": 2.99,
-   "maxdd": -16.22,
-   "false_py": 0.21,
-   "score": 23.8885
+   "calmar": 0.39,
+   "sharpe": 0.65,
+   "maxdd": -20.45,
+   "false_py": 0.84,
+   "score": 0.264
   },
   {
    "params": {
-    "es": 55,
-    "sy": 60,
+    "es": 45,
+    "sy": 54,
+    "cr": 70,
+    "hy": 5.0,
+    "sofr": 15,
+    "nl": -200,
+    "vix": 25,
+    "dxp": 85
+   },
+   "calmar": 0.39,
+   "sharpe": 0.65,
+   "maxdd": -20.45,
+   "false_py": 0.84,
+   "score": 0.264
+  },
+  {
+   "params": {
+    "es": 45,
+    "sy": 54,
+    "cr": 70,
+    "hy": 5.0,
+    "sofr": 15,
+    "nl": -300,
+    "vix": 25,
+    "dxp": 85
+   },
+   "calmar": 0.39,
+   "sharpe": 0.65,
+   "maxdd": -20.45,
+   "false_py": 0.84,
+   "score": 0.264
+  },
+  {
+   "params": {
+    "es": 45,
+    "sy": 54,
     "cr": 70,
     "hy": 5.0,
     "sofr": 20,
     "nl": -150,
-    "vix": 35,
+    "vix": 25,
     "dxp": 85
    },
-   "calmar": 23.92,
-   "sharpe": 2.99,
-   "maxdd": -16.22,
-   "false_py": 0.21,
-   "score": 23.8885
+   "calmar": 0.39,
+   "sharpe": 0.65,
+   "maxdd": -20.45,
+   "false_py": 0.84,
+   "score": 0.264
   },
   {
    "params": {
-    "es": 55,
-    "sy": 60,
-    "cr": 70,
-    "hy": 5.5,
-    "sofr": 10,
-    "nl": -150,
-    "vix": 35,
-    "dxp": 85
-   },
-   "calmar": 23.92,
-   "sharpe": 2.99,
-   "maxdd": -16.22,
-   "false_py": 0.21,
-   "score": 23.8885
-  },
-  {
-   "params": {
-    "es": 55,
-    "sy": 60,
-    "cr": 70,
-    "hy": 5.5,
-    "sofr": 15,
-    "nl": -150,
-    "vix": 35,
-    "dxp": 85
-   },
-   "calmar": 23.92,
-   "sharpe": 2.99,
-   "maxdd": -16.22,
-   "false_py": 0.21,
-   "score": 23.8885
-  },
-  {
-   "params": {
-    "es": 55,
-    "sy": 60,
-    "cr": 70,
-    "hy": 5.5,
-    "sofr": 20,
-    "nl": -150,
-    "vix": 35,
-    "dxp": 85
-   },
-   "calmar": 23.92,
-   "sharpe": 2.99,
-   "maxdd": -16.22,
-   "false_py": 0.21,
-   "score": 23.8885
-  },
-  {
-   "params": {
-    "es": 55,
-    "sy": 60,
-    "cr": 70,
-    "hy": 6.0,
-    "sofr": 10,
-    "nl": -150,
-    "vix": 35,
-    "dxp": 85
-   },
-   "calmar": 23.92,
-   "sharpe": 2.99,
-   "maxdd": -16.22,
-   "false_py": 0.21,
-   "score": 23.8885
-  },
-  {
-   "params": {
-    "es": 55,
-    "sy": 60,
-    "cr": 70,
-    "hy": 6.0,
-    "sofr": 15,
-    "nl": -150,
-    "vix": 35,
-    "dxp": 85
-   },
-   "calmar": 23.92,
-   "sharpe": 2.99,
-   "maxdd": -16.22,
-   "false_py": 0.21,
-   "score": 23.8885
-  },
-  {
-   "params": {
-    "es": 55,
-    "sy": 60,
-    "cr": 70,
-    "hy": 6.0,
-    "sofr": 20,
-    "nl": -150,
-    "vix": 35,
-    "dxp": 85
-   },
-   "calmar": 23.92,
-   "sharpe": 2.99,
-   "maxdd": -16.22,
-   "false_py": 0.21,
-   "score": 23.8885
-  },
-  {
-   "params": {
-    "es": 55,
-    "sy": 66,
+    "es": 45,
+    "sy": 54,
     "cr": 70,
     "hy": 5.0,
-    "sofr": 10,
-    "nl": -150,
-    "vix": 35,
+    "sofr": 20,
+    "nl": -200,
+    "vix": 25,
     "dxp": 85
    },
-   "calmar": 23.92,
-   "sharpe": 2.99,
-   "maxdd": -16.22,
-   "false_py": 0.21,
-   "score": 23.8885
+   "calmar": 0.39,
+   "sharpe": 0.65,
+   "maxdd": -20.45,
+   "false_py": 0.84,
+   "score": 0.264
+  },
+  {
+   "params": {
+    "es": 45,
+    "sy": 54,
+    "cr": 70,
+    "hy": 5.0,
+    "sofr": 20,
+    "nl": -300,
+    "vix": 25,
+    "dxp": 85
+   },
+   "calmar": 0.39,
+   "sharpe": 0.65,
+   "maxdd": -20.45,
+   "false_py": 0.84,
+   "score": 0.264
+  },
+  {
+   "params": {
+    "es": 45,
+    "sy": 54,
+    "cr": 70,
+    "hy": 5.5,
+    "sofr": 10,
+    "nl": -150,
+    "vix": 25,
+    "dxp": 85
+   },
+   "calmar": 0.39,
+   "sharpe": 0.65,
+   "maxdd": -20.45,
+   "false_py": 0.84,
+   "score": 0.264
   }
  ],
  "robustness_top10": {
   "es": 10,
-  "sy": 9,
-  "hy": 4,
+  "sy": 10,
+  "hy": 9,
   "sofr": 4,
-  "nl": 10,
+  "nl": 4,
   "vix": 10
  },
  "errors": [],
@@ -248,360 +248,674 @@
   "portfolio": {
    "is": {
     "strategy": {
-     "cagr": 259.89,
-     "vol": 50.6,
-     "sharpe": 2.79,
-     "maxdd": -14.12,
-     "calmar": 18.4
+     "cagr": 8.05,
+     "vol": 13.39,
+     "sharpe": 0.65,
+     "maxdd": -21.56,
+     "calmar": 0.37
     },
     "buy_hold": {
-     "cagr": 677.84,
-     "vol": 88.0,
-     "sharpe": 2.78,
-     "maxdd": -23.93,
-     "calmar": 28.33
+     "cagr": 10.1,
+     "vol": 21.6,
+     "sharpe": 0.55,
+     "maxdd": -33.72,
+     "calmar": 0.3
     }
    },
    "oos": {
     "strategy": {
-     "cagr": 611.21,
-     "vol": 34.65,
-     "sharpe": 5.85,
-     "maxdd": -5.67,
-     "calmar": 107.8
+     "cagr": 13.02,
+     "vol": 9.86,
+     "sharpe": 1.29,
+     "maxdd": -13.24,
+     "calmar": 0.98
     },
     "buy_hold": {
-     "cagr": 2600.14,
-     "vol": 60.25,
-     "sharpe": 5.8,
-     "maxdd": -9.85,
-     "calmar": 264.07
+     "cagr": 17.82,
+     "vol": 15.21,
+     "sharpe": 1.15,
+     "maxdd": -18.76,
+     "calmar": 0.95
     }
    },
    "full": {
     "strategy": {
-     "cagr": 328.63,
-     "vol": 42.24,
-     "sharpe": 3.67,
-     "maxdd": -32.75,
-     "calmar": 10.03
+     "cagr": 7.84,
+     "vol": 11.65,
+     "sharpe": 0.71,
+     "maxdd": -35.67,
+     "calmar": 0.22
     },
     "buy_hold": {
-     "cagr": 689.2,
-     "vol": 67.47,
-     "sharpe": 3.41,
-     "maxdd": -50.78,
-     "calmar": 13.57
+     "cagr": 10.23,
+     "vol": 18.63,
+     "sharpe": 0.62,
+     "maxdd": -55.19,
+     "calmar": 0.19
     }
    }
   },
   "regimes_is": {
+   "valuationDip": {
+    "days": 502,
+    "share": 41.9,
+    "spy20": 1.05,
+    "spy60": 2.81,
+    "gold20": 0.44,
+    "gold60": 1.93,
+    "mdd60": -5.88
+   },
    "earlyStress": {
-    "days": 56,
-    "share": 100.0,
-    "spy20": 24.21,
-    "spy60": 93.57,
-    "gold20": 18.36,
-    "gold60": 94.25,
-    "mdd60": -9.3
+    "days": 680,
+    "share": 56.8,
+    "spy20": 0.87,
+    "spy60": 2.67,
+    "gold20": 0.92,
+    "gold60": 2.34,
+    "mdd60": -5.86
+   },
+   "crisis": {
+    "days": 15,
+    "share": 1.3,
+    "spy20": 2.17,
+    "spy60": 3.27,
+    "gold20": -3.08,
+    "gold60": -2.81,
+    "mdd60": -0.78
    }
   },
   "regimes_oos": {
+   "valuationDip": {
+    "days": 324,
+    "share": 33.2,
+    "spy20": 0.92,
+    "spy60": 5.14,
+    "gold20": 1.24,
+    "gold60": 5.54,
+    "mdd60": -4.48
+   },
    "earlyStress": {
-    "days": 48,
-    "share": 100.0,
-    "spy20": 35.54,
-    "spy60": null,
-    "gold20": 63.43,
-    "gold60": null,
-    "mdd60": -2.97
+    "days": 624,
+    "share": 63.9,
+    "spy20": 1.8,
+    "spy60": 4.5,
+    "gold20": 1.86,
+    "gold60": 5.73,
+    "mdd60": -3.53
+   },
+   "crisis": {
+    "days": 28,
+    "share": 2.9,
+    "spy20": 2.51,
+    "spy60": 9.87,
+    "gold20": 2.59,
+    "gold60": 7.0,
+    "mdd60": -5.12
    }
   },
   "regimes_full": {
    "expansion": {
-    "days": 6,
-    "share": 2.2,
-    "spy20": 18.15,
-    "spy60": -4.6,
-    "gold20": 46.14,
-    "gold60": 140.46,
-    "mdd60": -27.75
+    "days": 62,
+    "share": 1.1,
+    "spy20": 1.75,
+    "spy60": 2.81,
+    "gold20": 0.5,
+    "gold60": -2.23,
+    "mdd60": -1.62
    },
    "valuationDip": {
-    "days": 111,
-    "share": 40.7,
-    "spy20": 21.5,
-    "spy60": 70.43,
-    "gold20": 11.56,
-    "gold60": 41.39,
-    "mdd60": -9.98
+    "days": 2519,
+    "share": 43.8,
+    "spy20": 0.92,
+    "spy60": 2.78,
+    "gold20": 0.65,
+    "gold60": 1.87,
+    "mdd60": -4.22
    },
    "earlyStress": {
-    "days": 156,
-    "share": 57.1,
-    "spy20": 20.15,
-    "spy60": 77.84,
-    "gold20": 30.54,
-    "gold60": 83.62,
-    "mdd60": -12.22
+    "days": 3023,
+    "share": 52.5,
+    "spy20": 0.87,
+    "spy60": 2.66,
+    "gold20": 1.11,
+    "gold60": 3.52,
+    "mdd60": -5.14
+   },
+   "crisis": {
+    "days": 153,
+    "share": 2.7,
+    "spy20": 0.87,
+    "spy60": 3.55,
+    "gold20": 1.46,
+    "gold60": 5.75,
+    "mdd60": -4.34
    }
   },
   "alarms_is": {
-   "entries": 0,
-   "true": 0,
-   "false": 0,
-   "false_per_year": 0.0,
-   "list": []
+   "entries": 13,
+   "true": 4,
+   "false": 9,
+   "false_per_year": 1.9,
+   "list": [
+    {
+     "d": "2019-04-05",
+     "reg": "earlyStress",
+     "mdd60": -4.9,
+     "true": false
+    },
+    {
+     "d": "2019-06-26",
+     "reg": "earlyStress",
+     "mdd60": -2.3,
+     "true": false
+    },
+    {
+     "d": "2019-08-15",
+     "reg": "earlyStress",
+     "mdd60": 0.0,
+     "true": false
+    },
+    {
+     "d": "2020-03-03",
+     "reg": "earlyStress",
+     "mdd60": -25.3,
+     "true": true
+    },
+    {
+     "d": "2020-06-22",
+     "reg": "earlyStress",
+     "mdd60": -3.4,
+     "true": false
+    },
+    {
+     "d": "2021-07-06",
+     "reg": "earlyStress",
+     "mdd60": -1.8,
+     "true": false
+    },
+    {
+     "d": "2021-10-04",
+     "reg": "earlyStress",
+     "mdd60": 0.0,
+     "true": false
+    },
+    {
+     "d": "2021-11-23",
+     "reg": "earlyStress",
+     "mdd60": -7.6,
+     "true": true
+    },
+    {
+     "d": "2022-04-04",
+     "reg": "earlyStress",
+     "mdd60": -19.7,
+     "true": true
+    },
+    {
+     "d": "2022-11-07",
+     "reg": "earlyStress",
+     "mdd60": -1.5,
+     "true": false
+    },
+    {
+     "d": "2022-11-17",
+     "reg": "earlyStress",
+     "mdd60": -4.0,
+     "true": false
+    },
+    {
+     "d": "2022-12-02",
+     "reg": "earlyStress",
+     "mdd60": -7.0,
+     "true": true
+    },
+    {
+     "d": "2022-12-27",
+     "reg": "earlyStress",
+     "mdd60": -1.2,
+     "true": false
+    }
+   ]
   },
   "alarms_oos": {
-   "entries": 0,
-   "true": 0,
-   "false": 0,
-   "false_per_year": 0.0,
-   "list": []
+   "entries": 15,
+   "true": 3,
+   "false": 12,
+   "false_per_year": 3.09,
+   "list": [
+    {
+     "d": "2023-02-27",
+     "reg": "earlyStress",
+     "mdd60": -3.1,
+     "true": false
+    },
+    {
+     "d": "2023-03-15",
+     "reg": "earlyStress",
+     "mdd60": 0.0,
+     "true": false
+    },
+    {
+     "d": "2023-04-21",
+     "reg": "earlyStress",
+     "mdd60": -1.9,
+     "true": false
+    },
+    {
+     "d": "2023-05-31",
+     "reg": "earlyStress",
+     "mdd60": 0.0,
+     "true": false
+    },
+    {
+     "d": "2023-09-20",
+     "reg": "earlyStress",
+     "mdd60": -6.4,
+     "true": false
+    },
+    {
+     "d": "2024-01-12",
+     "reg": "earlyStress",
+     "mdd60": -0.9,
+     "true": false
+    },
+    {
+     "d": "2024-12-10",
+     "reg": "earlyStress",
+     "mdd60": -7.5,
+     "true": true
+    },
+    {
+     "d": "2025-02-10",
+     "reg": "earlyStress",
+     "mdd60": -17.7,
+     "true": true
+    },
+    {
+     "d": "2025-04-08",
+     "reg": "earlyStress",
+     "mdd60": 0.0,
+     "true": false
+    },
+    {
+     "d": "2025-09-04",
+     "reg": "earlyStress",
+     "mdd60": -0.3,
+     "true": false
+    },
+    {
+     "d": "2026-03-24",
+     "reg": "earlyStress",
+     "mdd60": -3.2,
+     "true": false
+    },
+    {
+     "d": "2026-05-05",
+     "reg": "earlyStress",
+     "mdd60": 0.0,
+     "true": false
+    },
+    {
+     "d": "2026-06-08",
+     "reg": "earlyStress",
+     "mdd60": -1.9,
+     "true": false
+    },
+    {
+     "d": "2026-07-31",
+     "reg": "earlyStress",
+     "mdd60": 0.0,
+     "true": false
+    },
+    {
+     "d": "2026-09-28",
+     "reg": "earlyStress",
+     "mdd60": -9.9,
+     "true": true
+    }
+   ]
   },
   "episodes": [
    {
     "event": "ليمان براذرز",
     "date": "2008-09-15",
-    "regime_at_event": "earlyStress",
-    "composite_at_event": 58.7,
+    "regime_at_event": "valuationDip",
+    "composite_at_event": 49.8,
     "gates_at_event": 1,
-    "first_warning": "2006-08-31",
-    "lead_days": 746
+    "first_warning": "2008-06-30",
+    "lead_days": 77
    },
    {
     "event": "خفض تصنيف أمريكا",
     "date": "2011-08-05",
     "regime_at_event": "valuationDip",
-    "composite_at_event": 48.2,
+    "composite_at_event": 60.2,
     "gates_at_event": 0,
-    "first_warning": null,
-    "lead_days": null
+    "first_warning": "2011-08-08",
+    "lead_days": -3
    },
    {
     "event": "تخفيض اليوان",
     "date": "2015-08-24",
     "regime_at_event": "earlyStress",
-    "composite_at_event": 59.7,
-    "gates_at_event": 0,
-    "first_warning": "2015-08-31",
-    "lead_days": -7
+    "composite_at_event": 76.2,
+    "gates_at_event": 1,
+    "first_warning": "2015-04-27",
+    "lead_days": 119
    },
    {
     "event": "قاع الربع الرابع 2018",
     "date": "2018-12-24",
     "regime_at_event": "earlyStress",
-    "composite_at_event": 71.2,
-    "gates_at_event": 1,
-    "first_warning": "2018-02-01",
-    "lead_days": 326
+    "composite_at_event": 60.6,
+    "gates_at_event": 0,
+    "first_warning": "2018-02-05",
+    "lead_days": 322
    },
    {
     "event": "بداية كوفيد",
     "date": "2020-02-24",
-    "regime_at_event": "earlyStress",
-    "composite_at_event": 58.8,
+    "regime_at_event": "valuationDip",
+    "composite_at_event": 50.5,
     "gates_at_event": 0,
-    "first_warning": "2018-02-01",
-    "lead_days": 753
+    "first_warning": "2020-03-03",
+    "lead_days": -8
    },
    {
     "event": "صدمة التضخم 2022",
     "date": "2022-06-13",
     "regime_at_event": "earlyStress",
-    "composite_at_event": 67.5,
-    "gates_at_event": 1,
-    "first_warning": "2018-02-01",
-    "lead_days": 1593
+    "composite_at_event": 57.7,
+    "gates_at_event": 0,
+    "first_warning": "2022-04-04",
+    "lead_days": 70
    },
    {
     "event": "انهيار SVB",
     "date": "2023-03-10",
-    "regime_at_event": "earlyStress",
-    "composite_at_event": 48.6,
+    "regime_at_event": "valuationDip",
+    "composite_at_event": 53.0,
     "gates_at_event": 0,
-    "first_warning": "2018-02-01",
-    "lead_days": 1863
+    "first_warning": "2022-12-27",
+    "lead_days": 73
    },
    {
     "event": "فك تجارة الين",
     "date": "2024-08-05",
     "regime_at_event": "earlyStress",
-    "composite_at_event": 47.6,
+    "composite_at_event": 75.3,
     "gates_at_event": 0,
-    "first_warning": "2018-02-01",
-    "lead_days": 2377
+    "first_warning": "2024-01-12",
+    "lead_days": 206
    },
    {
     "event": "صدمة الرسوم الجمركية",
     "date": "2025-04-04",
-    "regime_at_event": "earlyStress",
-    "composite_at_event": 75.9,
+    "regime_at_event": "valuationDip",
+    "composite_at_event": 53.4,
     "gates_at_event": 0,
-    "first_warning": "2018-02-01",
-    "lead_days": 2619
+    "first_warning": "2024-12-10",
+    "lead_days": 115
    }
   ],
   "current": {
    "d": "2026-11-20",
-   "comp": 73.4,
+   "comp": 65.5,
    "sys": 72.7,
    "g": 0,
-   "raw": "crisis",
-   "reg": "earlyStress"
+   "raw": "earlyStress",
+   "reg": "crisis"
   }
  },
  "best_eval": {
   "portfolio": {
    "is": {
     "strategy": {
-     "cagr": 387.9,
-     "vol": 58.83,
-     "sharpe": 2.99,
-     "maxdd": -16.22,
-     "calmar": 23.92
+     "cagr": 7.89,
+     "vol": 12.91,
+     "sharpe": 0.65,
+     "maxdd": -20.45,
+     "calmar": 0.39
     },
     "buy_hold": {
-     "cagr": 677.84,
-     "vol": 88.0,
-     "sharpe": 2.78,
-     "maxdd": -23.93,
-     "calmar": 28.33
+     "cagr": 10.1,
+     "vol": 21.6,
+     "sharpe": 0.55,
+     "maxdd": -33.72,
+     "calmar": 0.3
     }
    },
    "oos": {
     "strategy": {
-     "cagr": 639.16,
-     "vol": 34.7,
-     "sharpe": 5.96,
-     "maxdd": -5.67,
-     "calmar": 112.73
+     "cagr": 12.52,
+     "vol": 8.96,
+     "sharpe": 1.36,
+     "maxdd": -11.02,
+     "calmar": 1.14
     },
     "buy_hold": {
-     "cagr": 2600.14,
-     "vol": 60.25,
-     "sharpe": 5.8,
-     "maxdd": -9.85,
-     "calmar": 264.07
+     "cagr": 17.82,
+     "vol": 15.21,
+     "sharpe": 1.15,
+     "maxdd": -18.76,
+     "calmar": 0.95
     }
    },
    "full": {
     "strategy": {
-     "cagr": 336.21,
-     "vol": 46.03,
-     "sharpe": 3.44,
-     "maxdd": -38.61,
-     "calmar": 8.71
+     "cagr": 7.61,
+     "vol": 11.27,
+     "sharpe": 0.71,
+     "maxdd": -35.61,
+     "calmar": 0.21
     },
     "buy_hold": {
-     "cagr": 689.2,
-     "vol": 67.47,
-     "sharpe": 3.41,
-     "maxdd": -50.78,
-     "calmar": 13.57
+     "cagr": 10.26,
+     "vol": 18.63,
+     "sharpe": 0.62,
+     "maxdd": -55.19,
+     "calmar": 0.19
     }
    }
   },
   "regimes_is": {
    "valuationDip": {
-    "days": 27,
-    "share": 48.2,
-    "spy20": 17.7,
-    "spy60": 94.78,
-    "gold20": 3.87,
-    "gold60": 115.12,
-    "mdd60": -9.51
+    "days": 344,
+    "share": 28.7,
+    "spy20": 2.11,
+    "spy60": 3.88,
+    "gold20": -0.12,
+    "gold60": 0.67,
+    "mdd60": -4.69
    },
    "earlyStress": {
-    "days": 29,
-    "share": 51.8,
-    "spy20": 30.27,
-    "spy60": 91.99,
-    "gold20": 31.85,
-    "gold60": 66.8,
-    "mdd60": -9.1
+    "days": 838,
+    "share": 70.0,
+    "spy20": 0.46,
+    "spy60": 2.25,
+    "gold20": 1.06,
+    "gold60": 2.78,
+    "mdd60": -6.35
+   },
+   "crisis": {
+    "days": 15,
+    "share": 1.3,
+    "spy20": 2.17,
+    "spy60": 3.27,
+    "gold20": -3.08,
+    "gold60": -2.81,
+    "mdd60": -0.78
    }
   },
   "regimes_oos": {
    "valuationDip": {
-    "days": 4,
-    "share": 8.3,
-    "spy20": null,
-    "spy60": null,
-    "gold20": null,
-    "gold60": null,
-    "mdd60": -2.56
+    "days": 148,
+    "share": 15.2,
+    "spy20": 0.26,
+    "spy60": 5.63,
+    "gold20": 1.13,
+    "gold60": 5.33,
+    "mdd60": -4.08
    },
    "earlyStress": {
-    "days": 44,
-    "share": 91.7,
-    "spy20": 35.54,
-    "spy60": null,
-    "gold20": 63.43,
-    "gold60": null,
-    "mdd60": -3.01
+    "days": 800,
+    "share": 82.0,
+    "spy20": 1.72,
+    "spy60": 4.54,
+    "gold20": 1.74,
+    "gold60": 5.73,
+    "mdd60": -3.81
+   },
+   "crisis": {
+    "days": 28,
+    "share": 2.9,
+    "spy20": 2.51,
+    "spy60": 9.87,
+    "gold20": 2.59,
+    "gold60": 7.0,
+    "mdd60": -5.12
    }
   },
   "regimes_full": {
    "expansion": {
-    "days": 6,
-    "share": 2.2,
-    "spy20": 18.15,
-    "spy60": -4.6,
-    "gold20": 46.14,
-    "gold60": 140.46,
-    "mdd60": -27.75
+    "days": 62,
+    "share": 1.1,
+    "spy20": 1.75,
+    "spy60": 2.81,
+    "gold20": 0.5,
+    "gold60": -2.23,
+    "mdd60": -1.62
    },
    "valuationDip": {
-    "days": 175,
-    "share": 64.1,
-    "spy20": 14.94,
-    "spy60": 66.56,
-    "gold20": 12.42,
-    "gold60": 62.06,
-    "mdd60": -14.58
+    "days": 1913,
+    "share": 33.2,
+    "spy20": 1.09,
+    "spy60": 2.88,
+    "gold20": 0.58,
+    "gold60": 1.6,
+    "mdd60": -3.83
    },
    "earlyStress": {
-    "days": 92,
-    "share": 33.7,
-    "spy20": 33.83,
-    "spy60": 106.4,
-    "gold20": 43.59,
-    "gold60": 56.18,
-    "mdd60": -5.03
+    "days": 3627,
+    "share": 63.0,
+    "spy20": 0.79,
+    "spy60": 2.63,
+    "gold20": 1.07,
+    "gold60": 3.4,
+    "mdd60": -5.19
+   },
+   "crisis": {
+    "days": 153,
+    "share": 2.7,
+    "spy20": 0.87,
+    "spy60": 3.55,
+    "gold20": 1.46,
+    "gold60": 5.75,
+    "mdd60": -4.34
    }
   },
   "alarms_is": {
-   "entries": 2,
-   "true": 1,
-   "false": 1,
-   "false_per_year": 0.21,
+   "entries": 6,
+   "true": 2,
+   "false": 4,
+   "false_per_year": 0.84,
    "list": [
     {
-     "d": "2018-05-31",
+     "d": "2019-04-02",
      "reg": "earlyStress",
-     "mdd60": -6.9,
+     "mdd60": -4.0,
      "true": false
     },
     {
-     "d": "2022-03-01",
+     "d": "2020-01-27",
      "reg": "earlyStress",
-     "mdd60": -20.2,
+     "mdd60": -30.7,
+     "true": true
+    },
+    {
+     "d": "2021-01-19",
+     "reg": "earlyStress",
+     "mdd60": -2.3,
+     "true": false
+    },
+    {
+     "d": "2021-06-28",
+     "reg": "earlyStress",
+     "mdd60": -0.6,
+     "true": false
+    },
+    {
+     "d": "2021-10-01",
+     "reg": "earlyStress",
+     "mdd60": -1.3,
+     "true": false
+    },
+    {
+     "d": "2021-11-19",
+     "reg": "earlyStress",
+     "mdd60": -7.7,
      "true": true
     }
    ]
   },
   "alarms_oos": {
-   "entries": 1,
-   "true": 0,
-   "false": 1,
-   "false_per_year": 0.26,
+   "entries": 9,
+   "true": 2,
+   "false": 7,
+   "false_per_year": 1.8,
    "list": [
     {
-     "d": "2025-12-01",
+     "d": "2023-02-27",
      "reg": "earlyStress",
-     "mdd60": -4.4,
+     "mdd60": -3.1,
+     "true": false
+    },
+    {
+     "d": "2024-01-12",
+     "reg": "earlyStress",
+     "mdd60": -0.9,
+     "true": false
+    },
+    {
+     "d": "2025-03-31",
+     "reg": "earlyStress",
+     "mdd60": -11.2,
+     "true": true
+    },
+    {
+     "d": "2025-07-08",
+     "reg": "earlyStress",
+     "mdd60": 0.0,
+     "true": false
+    },
+    {
+     "d": "2025-08-19",
+     "reg": "earlyStress",
+     "mdd60": -0.7,
+     "true": false
+    },
+    {
+     "d": "2026-03-04",
+     "reg": "earlyStress",
+     "mdd60": -7.5,
+     "true": true
+    },
+    {
+     "d": "2026-04-27",
+     "reg": "earlyStress",
+     "mdd60": -0.5,
+     "true": false
+    },
+    {
+     "d": "2026-06-08",
+     "reg": "earlyStress",
+     "mdd60": -1.9,
+     "true": false
+    },
+    {
+     "d": "2026-07-28",
+     "reg": "earlyStress",
+     "mdd60": -1.5,
      "true": false
     }
    ]
@@ -610,92 +924,92 @@
    {
     "event": "ليمان براذرز",
     "date": "2008-09-15",
-    "regime_at_event": "valuationDip",
-    "composite_at_event": 58.7,
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 49.8,
     "gates_at_event": 1,
-    "first_warning": null,
-    "lead_days": null
+    "first_warning": "2008-06-11",
+    "lead_days": 96
    },
    {
     "event": "خفض تصنيف أمريكا",
     "date": "2011-08-05",
-    "regime_at_event": "valuationDip",
-    "composite_at_event": 48.2,
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 60.2,
     "gates_at_event": 0,
-    "first_warning": null,
-    "lead_days": null
+    "first_warning": "2011-08-01",
+    "lead_days": 4
    },
    {
     "event": "تخفيض اليوان",
     "date": "2015-08-24",
     "regime_at_event": "earlyStress",
-    "composite_at_event": 59.7,
-    "gates_at_event": 0,
-    "first_warning": "2015-08-31",
-    "lead_days": -7
+    "composite_at_event": 76.2,
+    "gates_at_event": 1,
+    "first_warning": "2015-04-27",
+    "lead_days": 119
    },
    {
     "event": "قاع الربع الرابع 2018",
     "date": "2018-12-24",
     "regime_at_event": "earlyStress",
-    "composite_at_event": 71.2,
-    "gates_at_event": 1,
-    "first_warning": "2018-05-31",
-    "lead_days": 207
+    "composite_at_event": 60.6,
+    "gates_at_event": 0,
+    "first_warning": "2018-02-05",
+    "lead_days": 322
    },
    {
     "event": "بداية كوفيد",
     "date": "2020-02-24",
-    "regime_at_event": "valuationDip",
-    "composite_at_event": 58.8,
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 50.5,
     "gates_at_event": 0,
-    "first_warning": "2018-05-31",
-    "lead_days": 634
+    "first_warning": "2020-01-27",
+    "lead_days": 28
    },
    {
     "event": "صدمة التضخم 2022",
     "date": "2022-06-13",
     "regime_at_event": "earlyStress",
-    "composite_at_event": 67.5,
-    "gates_at_event": 1,
-    "first_warning": "2022-03-01",
-    "lead_days": 104
+    "composite_at_event": 57.7,
+    "gates_at_event": 0,
+    "first_warning": "2021-11-19",
+    "lead_days": 206
    },
    {
     "event": "انهيار SVB",
     "date": "2023-03-10",
     "regime_at_event": "earlyStress",
-    "composite_at_event": 48.6,
+    "composite_at_event": 53.0,
     "gates_at_event": 0,
-    "first_warning": "2022-03-01",
-    "lead_days": 374
+    "first_warning": "2021-11-19",
+    "lead_days": 476
    },
    {
     "event": "فك تجارة الين",
     "date": "2024-08-05",
     "regime_at_event": "earlyStress",
-    "composite_at_event": 47.6,
+    "composite_at_event": 75.3,
     "gates_at_event": 0,
-    "first_warning": "2022-03-01",
-    "lead_days": 888
+    "first_warning": "2024-01-12",
+    "lead_days": 206
    },
    {
     "event": "صدمة الرسوم الجمركية",
     "date": "2025-04-04",
     "regime_at_event": "earlyStress",
-    "composite_at_event": 75.9,
-    "gates_at_event": 1,
-    "first_warning": "2022-03-01",
-    "lead_days": 1130
+    "composite_at_event": 53.4,
+    "gates_at_event": 0,
+    "first_warning": "2024-01-12",
+    "lead_days": 448
    }
   ],
   "current": {
    "d": "2026-11-20",
-   "comp": 73.4,
+   "comp": 65.5,
    "sys": 72.7,
-   "g": 0,
-   "raw": "crisis",
-   "reg": "earlyStress"
+   "g": 1,
+   "raw": "earlyStress",
+   "reg": "crisis"
   }
  }
 }
