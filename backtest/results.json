@@ -1,0 +1,701 @@
+{
+ "generated": "2026-11-21T22:57:12Z",
+ "panel": {
+  "start": "2004-01-01",
+  "end": "2026-11-20",
+  "days": 276
+ },
+ "lags_days": {
+  "WALCL": 1,
+  "WTREGEN": 1,
+  "RRPONTSYD": 0,
+  "SOFR": 1,
+  "IORB": 0,
+  "IOER": 0,
+  "DTWEXBGS": 7,
+  "BAMLH0A0HYM2": 1,
+  "T10Y2Y": 0,
+  "DFII10": 0,
+  "VIXCLS": 0,
+  "SKEW": 0,
+  "BREADTH": 0
+ },
+ "in_sample": [
+  "2018-04-03",
+  "2022-12-31"
+ ],
+ "out_sample": [
+  "2023-01-01",
+  "2026-11-20"
+ ],
+ "grid_size": 729,
+ "default": {
+  "es": 50,
+  "sy": 54,
+  "cr": 70,
+  "hy": 5.5,
+  "sofr": 15,
+  "nl": -200,
+  "vix": 30,
+  "dxp": 85
+ },
+ "best": {
+  "es": 55,
+  "sy": 60,
+  "cr": 70,
+  "hy": 5.0,
+  "sofr": 10,
+  "nl": -150,
+  "vix": 35,
+  "dxp": 85
+ },
+ "best_is": {
+  "calmar": 23.92,
+  "sharpe": 2.99,
+  "maxdd": -16.22,
+  "false_py": 0.21,
+  "score": 23.8885
+ },
+ "default_is": {
+  "calmar": 18.4,
+  "sharpe": 2.79,
+  "maxdd": -14.12,
+  "false_py": 0.0,
+  "score": 18.4
+ },
+ "top10": [
+  {
+   "params": {
+    "es": 55,
+    "sy": 60,
+    "cr": 70,
+    "hy": 5.0,
+    "sofr": 10,
+    "nl": -150,
+    "vix": 35,
+    "dxp": 85
+   },
+   "calmar": 23.92,
+   "sharpe": 2.99,
+   "maxdd": -16.22,
+   "false_py": 0.21,
+   "score": 23.8885
+  },
+  {
+   "params": {
+    "es": 55,
+    "sy": 60,
+    "cr": 70,
+    "hy": 5.0,
+    "sofr": 15,
+    "nl": -150,
+    "vix": 35,
+    "dxp": 85
+   },
+   "calmar": 23.92,
+   "sharpe": 2.99,
+   "maxdd": -16.22,
+   "false_py": 0.21,
+   "score": 23.8885
+  },
+  {
+   "params": {
+    "es": 55,
+    "sy": 60,
+    "cr": 70,
+    "hy": 5.0,
+    "sofr": 20,
+    "nl": -150,
+    "vix": 35,
+    "dxp": 85
+   },
+   "calmar": 23.92,
+   "sharpe": 2.99,
+   "maxdd": -16.22,
+   "false_py": 0.21,
+   "score": 23.8885
+  },
+  {
+   "params": {
+    "es": 55,
+    "sy": 60,
+    "cr": 70,
+    "hy": 5.5,
+    "sofr": 10,
+    "nl": -150,
+    "vix": 35,
+    "dxp": 85
+   },
+   "calmar": 23.92,
+   "sharpe": 2.99,
+   "maxdd": -16.22,
+   "false_py": 0.21,
+   "score": 23.8885
+  },
+  {
+   "params": {
+    "es": 55,
+    "sy": 60,
+    "cr": 70,
+    "hy": 5.5,
+    "sofr": 15,
+    "nl": -150,
+    "vix": 35,
+    "dxp": 85
+   },
+   "calmar": 23.92,
+   "sharpe": 2.99,
+   "maxdd": -16.22,
+   "false_py": 0.21,
+   "score": 23.8885
+  },
+  {
+   "params": {
+    "es": 55,
+    "sy": 60,
+    "cr": 70,
+    "hy": 5.5,
+    "sofr": 20,
+    "nl": -150,
+    "vix": 35,
+    "dxp": 85
+   },
+   "calmar": 23.92,
+   "sharpe": 2.99,
+   "maxdd": -16.22,
+   "false_py": 0.21,
+   "score": 23.8885
+  },
+  {
+   "params": {
+    "es": 55,
+    "sy": 60,
+    "cr": 70,
+    "hy": 6.0,
+    "sofr": 10,
+    "nl": -150,
+    "vix": 35,
+    "dxp": 85
+   },
+   "calmar": 23.92,
+   "sharpe": 2.99,
+   "maxdd": -16.22,
+   "false_py": 0.21,
+   "score": 23.8885
+  },
+  {
+   "params": {
+    "es": 55,
+    "sy": 60,
+    "cr": 70,
+    "hy": 6.0,
+    "sofr": 15,
+    "nl": -150,
+    "vix": 35,
+    "dxp": 85
+   },
+   "calmar": 23.92,
+   "sharpe": 2.99,
+   "maxdd": -16.22,
+   "false_py": 0.21,
+   "score": 23.8885
+  },
+  {
+   "params": {
+    "es": 55,
+    "sy": 60,
+    "cr": 70,
+    "hy": 6.0,
+    "sofr": 20,
+    "nl": -150,
+    "vix": 35,
+    "dxp": 85
+   },
+   "calmar": 23.92,
+   "sharpe": 2.99,
+   "maxdd": -16.22,
+   "false_py": 0.21,
+   "score": 23.8885
+  },
+  {
+   "params": {
+    "es": 55,
+    "sy": 66,
+    "cr": 70,
+    "hy": 5.0,
+    "sofr": 10,
+    "nl": -150,
+    "vix": 35,
+    "dxp": 85
+   },
+   "calmar": 23.92,
+   "sharpe": 2.99,
+   "maxdd": -16.22,
+   "false_py": 0.21,
+   "score": 23.8885
+  }
+ ],
+ "robustness_top10": {
+  "es": 10,
+  "sy": 9,
+  "hy": 4,
+  "sofr": 4,
+  "nl": 10,
+  "vix": 10
+ },
+ "errors": [],
+ "default_eval": {
+  "portfolio": {
+   "is": {
+    "strategy": {
+     "cagr": 259.89,
+     "vol": 50.6,
+     "sharpe": 2.79,
+     "maxdd": -14.12,
+     "calmar": 18.4
+    },
+    "buy_hold": {
+     "cagr": 677.84,
+     "vol": 88.0,
+     "sharpe": 2.78,
+     "maxdd": -23.93,
+     "calmar": 28.33
+    }
+   },
+   "oos": {
+    "strategy": {
+     "cagr": 611.21,
+     "vol": 34.65,
+     "sharpe": 5.85,
+     "maxdd": -5.67,
+     "calmar": 107.8
+    },
+    "buy_hold": {
+     "cagr": 2600.14,
+     "vol": 60.25,
+     "sharpe": 5.8,
+     "maxdd": -9.85,
+     "calmar": 264.07
+    }
+   },
+   "full": {
+    "strategy": {
+     "cagr": 328.63,
+     "vol": 42.24,
+     "sharpe": 3.67,
+     "maxdd": -32.75,
+     "calmar": 10.03
+    },
+    "buy_hold": {
+     "cagr": 689.2,
+     "vol": 67.47,
+     "sharpe": 3.41,
+     "maxdd": -50.78,
+     "calmar": 13.57
+    }
+   }
+  },
+  "regimes_is": {
+   "earlyStress": {
+    "days": 56,
+    "share": 100.0,
+    "spy20": 24.21,
+    "spy60": 93.57,
+    "gold20": 18.36,
+    "gold60": 94.25,
+    "mdd60": -9.3
+   }
+  },
+  "regimes_oos": {
+   "earlyStress": {
+    "days": 48,
+    "share": 100.0,
+    "spy20": 35.54,
+    "spy60": null,
+    "gold20": 63.43,
+    "gold60": null,
+    "mdd60": -2.97
+   }
+  },
+  "regimes_full": {
+   "expansion": {
+    "days": 6,
+    "share": 2.2,
+    "spy20": 18.15,
+    "spy60": -4.6,
+    "gold20": 46.14,
+    "gold60": 140.46,
+    "mdd60": -27.75
+   },
+   "valuationDip": {
+    "days": 111,
+    "share": 40.7,
+    "spy20": 21.5,
+    "spy60": 70.43,
+    "gold20": 11.56,
+    "gold60": 41.39,
+    "mdd60": -9.98
+   },
+   "earlyStress": {
+    "days": 156,
+    "share": 57.1,
+    "spy20": 20.15,
+    "spy60": 77.84,
+    "gold20": 30.54,
+    "gold60": 83.62,
+    "mdd60": -12.22
+   }
+  },
+  "alarms_is": {
+   "entries": 0,
+   "true": 0,
+   "false": 0,
+   "false_per_year": 0.0,
+   "list": []
+  },
+  "alarms_oos": {
+   "entries": 0,
+   "true": 0,
+   "false": 0,
+   "false_per_year": 0.0,
+   "list": []
+  },
+  "episodes": [
+   {
+    "event": "ليمان براذرز",
+    "date": "2008-09-15",
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 58.7,
+    "gates_at_event": 1,
+    "first_warning": "2006-08-31",
+    "lead_days": 746
+   },
+   {
+    "event": "خفض تصنيف أمريكا",
+    "date": "2011-08-05",
+    "regime_at_event": "valuationDip",
+    "composite_at_event": 48.2,
+    "gates_at_event": 0,
+    "first_warning": null,
+    "lead_days": null
+   },
+   {
+    "event": "تخفيض اليوان",
+    "date": "2015-08-24",
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 59.7,
+    "gates_at_event": 0,
+    "first_warning": "2015-08-31",
+    "lead_days": -7
+   },
+   {
+    "event": "قاع الربع الرابع 2018",
+    "date": "2018-12-24",
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 71.2,
+    "gates_at_event": 1,
+    "first_warning": "2018-02-01",
+    "lead_days": 326
+   },
+   {
+    "event": "بداية كوفيد",
+    "date": "2020-02-24",
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 58.8,
+    "gates_at_event": 0,
+    "first_warning": "2018-02-01",
+    "lead_days": 753
+   },
+   {
+    "event": "صدمة التضخم 2022",
+    "date": "2022-06-13",
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 67.5,
+    "gates_at_event": 1,
+    "first_warning": "2018-02-01",
+    "lead_days": 1593
+   },
+   {
+    "event": "انهيار SVB",
+    "date": "2023-03-10",
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 48.6,
+    "gates_at_event": 0,
+    "first_warning": "2018-02-01",
+    "lead_days": 1863
+   },
+   {
+    "event": "فك تجارة الين",
+    "date": "2024-08-05",
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 47.6,
+    "gates_at_event": 0,
+    "first_warning": "2018-02-01",
+    "lead_days": 2377
+   },
+   {
+    "event": "صدمة الرسوم الجمركية",
+    "date": "2025-04-04",
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 75.9,
+    "gates_at_event": 0,
+    "first_warning": "2018-02-01",
+    "lead_days": 2619
+   }
+  ],
+  "current": {
+   "d": "2026-11-20",
+   "comp": 73.4,
+   "sys": 72.7,
+   "g": 0,
+   "raw": "crisis",
+   "reg": "earlyStress"
+  }
+ },
+ "best_eval": {
+  "portfolio": {
+   "is": {
+    "strategy": {
+     "cagr": 387.9,
+     "vol": 58.83,
+     "sharpe": 2.99,
+     "maxdd": -16.22,
+     "calmar": 23.92
+    },
+    "buy_hold": {
+     "cagr": 677.84,
+     "vol": 88.0,
+     "sharpe": 2.78,
+     "maxdd": -23.93,
+     "calmar": 28.33
+    }
+   },
+   "oos": {
+    "strategy": {
+     "cagr": 639.16,
+     "vol": 34.7,
+     "sharpe": 5.96,
+     "maxdd": -5.67,
+     "calmar": 112.73
+    },
+    "buy_hold": {
+     "cagr": 2600.14,
+     "vol": 60.25,
+     "sharpe": 5.8,
+     "maxdd": -9.85,
+     "calmar": 264.07
+    }
+   },
+   "full": {
+    "strategy": {
+     "cagr": 336.21,
+     "vol": 46.03,
+     "sharpe": 3.44,
+     "maxdd": -38.61,
+     "calmar": 8.71
+    },
+    "buy_hold": {
+     "cagr": 689.2,
+     "vol": 67.47,
+     "sharpe": 3.41,
+     "maxdd": -50.78,
+     "calmar": 13.57
+    }
+   }
+  },
+  "regimes_is": {
+   "valuationDip": {
+    "days": 27,
+    "share": 48.2,
+    "spy20": 17.7,
+    "spy60": 94.78,
+    "gold20": 3.87,
+    "gold60": 115.12,
+    "mdd60": -9.51
+   },
+   "earlyStress": {
+    "days": 29,
+    "share": 51.8,
+    "spy20": 30.27,
+    "spy60": 91.99,
+    "gold20": 31.85,
+    "gold60": 66.8,
+    "mdd60": -9.1
+   }
+  },
+  "regimes_oos": {
+   "valuationDip": {
+    "days": 4,
+    "share": 8.3,
+    "spy20": null,
+    "spy60": null,
+    "gold20": null,
+    "gold60": null,
+    "mdd60": -2.56
+   },
+   "earlyStress": {
+    "days": 44,
+    "share": 91.7,
+    "spy20": 35.54,
+    "spy60": null,
+    "gold20": 63.43,
+    "gold60": null,
+    "mdd60": -3.01
+   }
+  },
+  "regimes_full": {
+   "expansion": {
+    "days": 6,
+    "share": 2.2,
+    "spy20": 18.15,
+    "spy60": -4.6,
+    "gold20": 46.14,
+    "gold60": 140.46,
+    "mdd60": -27.75
+   },
+   "valuationDip": {
+    "days": 175,
+    "share": 64.1,
+    "spy20": 14.94,
+    "spy60": 66.56,
+    "gold20": 12.42,
+    "gold60": 62.06,
+    "mdd60": -14.58
+   },
+   "earlyStress": {
+    "days": 92,
+    "share": 33.7,
+    "spy20": 33.83,
+    "spy60": 106.4,
+    "gold20": 43.59,
+    "gold60": 56.18,
+    "mdd60": -5.03
+   }
+  },
+  "alarms_is": {
+   "entries": 2,
+   "true": 1,
+   "false": 1,
+   "false_per_year": 0.21,
+   "list": [
+    {
+     "d": "2018-05-31",
+     "reg": "earlyStress",
+     "mdd60": -6.9,
+     "true": false
+    },
+    {
+     "d": "2022-03-01",
+     "reg": "earlyStress",
+     "mdd60": -20.2,
+     "true": true
+    }
+   ]
+  },
+  "alarms_oos": {
+   "entries": 1,
+   "true": 0,
+   "false": 1,
+   "false_per_year": 0.26,
+   "list": [
+    {
+     "d": "2025-12-01",
+     "reg": "earlyStress",
+     "mdd60": -4.4,
+     "true": false
+    }
+   ]
+  },
+  "episodes": [
+   {
+    "event": "ليمان براذرز",
+    "date": "2008-09-15",
+    "regime_at_event": "valuationDip",
+    "composite_at_event": 58.7,
+    "gates_at_event": 1,
+    "first_warning": null,
+    "lead_days": null
+   },
+   {
+    "event": "خفض تصنيف أمريكا",
+    "date": "2011-08-05",
+    "regime_at_event": "valuationDip",
+    "composite_at_event": 48.2,
+    "gates_at_event": 0,
+    "first_warning": null,
+    "lead_days": null
+   },
+   {
+    "event": "تخفيض اليوان",
+    "date": "2015-08-24",
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 59.7,
+    "gates_at_event": 0,
+    "first_warning": "2015-08-31",
+    "lead_days": -7
+   },
+   {
+    "event": "قاع الربع الرابع 2018",
+    "date": "2018-12-24",
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 71.2,
+    "gates_at_event": 1,
+    "first_warning": "2018-05-31",
+    "lead_days": 207
+   },
+   {
+    "event": "بداية كوفيد",
+    "date": "2020-02-24",
+    "regime_at_event": "valuationDip",
+    "composite_at_event": 58.8,
+    "gates_at_event": 0,
+    "first_warning": "2018-05-31",
+    "lead_days": 634
+   },
+   {
+    "event": "صدمة التضخم 2022",
+    "date": "2022-06-13",
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 67.5,
+    "gates_at_event": 1,
+    "first_warning": "2022-03-01",
+    "lead_days": 104
+   },
+   {
+    "event": "انهيار SVB",
+    "date": "2023-03-10",
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 48.6,
+    "gates_at_event": 0,
+    "first_warning": "2022-03-01",
+    "lead_days": 374
+   },
+   {
+    "event": "فك تجارة الين",
+    "date": "2024-08-05",
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 47.6,
+    "gates_at_event": 0,
+    "first_warning": "2022-03-01",
+    "lead_days": 888
+   },
+   {
+    "event": "صدمة الرسوم الجمركية",
+    "date": "2025-04-04",
+    "regime_at_event": "earlyStress",
+    "composite_at_event": 75.9,
+    "gates_at_event": 1,
+    "first_warning": "2022-03-01",
+    "lead_days": 1130
+   }
+  ],
+  "current": {
+   "d": "2026-11-20",
+   "comp": 73.4,
+   "sys": 72.7,
+   "g": 0,
+   "raw": "crisis",
+   "reg": "earlyStress"
+  }
+ }
+}
