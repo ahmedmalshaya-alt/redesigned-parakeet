@@ -300,7 +300,7 @@ def perf(rets):
 def portfolio(panel, regs, start, end):
     """Regime confirmed at close t sets cash weight for the return t+1 -> t+2 (one full day of delay)."""
     idx = {r["d"]: i for i, r in enumerate(panel)}
-    strat, bh = [], []
+    strat, bh, spy_r, cash_r, wts = [], [], [], [], []
     days = [x for x in regs if x and start <= x["d"] <= end]
     for x in days:
         i = idx[x["d"]]
@@ -311,7 +311,15 @@ def portfolio(panel, regs, start, end):
         r_cash = (a["tb3"] or 0) / 100 / 252
         w_cash = CASH[x["reg"]]
         strat.append((1 - w_cash) * r_spy + w_cash * r_cash)
-        bh.append(r_spy)
+        bh.append(r_spy); spy_r.append(r_spy); cash_r.append(r_cash); wts.append(w_cash)
+    # Honest benchmark: FIXED cash weight equal to the strategy's average cash weight.
+    # If the strategy can't beat this, its gain comes from holding less equity, not from timing.
+    avg_w = sum(wts) / len(wts) if wts else 0
+    static = [(1 - avg_w) * r + avg_w * c for r, c in zip(spy_r, cash_r)]
+    st = perf(static)
+    if st:
+        st["avg_cash_pct"] = round(avg_w * 100, 1)
+    portfolio.last_static = st
     return perf(strat), perf(bh)
 
 
@@ -441,12 +449,13 @@ def main():
 
     for label, P in (("default", DEFAULT), ("best", best)):
         regs_full = run_engine(panel, P)
-        s_is, b_is = portfolio(panel, regs_full, IS_START, IS_END)
-        s_oos, b_oos = portfolio(panel, regs_full, OOS_START, "9999")
-        s_all, b_all = portfolio(panel, regs_full, "2004-01-01", "9999")
+        s_is, b_is = portfolio(panel, regs_full, IS_START, IS_END); st_is = portfolio.last_static
+        s_oos, b_oos = portfolio(panel, regs_full, OOS_START, "9999"); st_oos = portfolio.last_static
+        s_all, b_all = portfolio(panel, regs_full, "2004-01-01", "9999"); st_all = portfolio.last_static
         report[label + "_eval"] = {
-            "portfolio": {"is": {"strategy": s_is, "buy_hold": b_is}, "oos": {"strategy": s_oos, "buy_hold": b_oos},
-                          "full": {"strategy": s_all, "buy_hold": b_all}},
+            "portfolio": {"is": {"strategy": s_is, "buy_hold": b_is, "static_same_cash": st_is},
+                          "oos": {"strategy": s_oos, "buy_hold": b_oos, "static_same_cash": st_oos},
+                          "full": {"strategy": s_all, "buy_hold": b_all, "static_same_cash": st_all}},
             "regimes_is": regime_stats(panel, regs_full, IS_START, IS_END),
             "regimes_oos": regime_stats(panel, regs_full, OOS_START, "9999"),
             "regimes_full": regime_stats(panel, regs_full, "2004-01-01", "9999"),
