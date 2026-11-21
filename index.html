@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" class="dark">
 <head>
@@ -865,18 +864,19 @@
       // -----------------------------------------------------------------------
       const INDICATORS_META = [
         // Pillar 1: Liquidity & Funding
-        { id: 'netLiquidity', pillar: 1, name: 'صافي سيولة الخزانة (TGA/RRP)', weight: 0.14, systemic: true, freq: 'weekly' },
-        { id: 'repoSofr', pillar: 1, name: 'احتياطيات البنوك والريبو (SOFR)', weight: 0.12, systemic: true, freq: 'daily' },
-        { id: 'dxy', pillar: 1, name: 'مؤشر الدولار العالمي (DXY)', weight: 0.10, systemic: true, freq: 'daily' },
+        // Scores are 0-100 rolling percentiles (~3y) computed by scripts/fetch_data.py; higher = more stress.
+        { id: 'netLiquidity', pillar: 1, name: 'صافي السيولة (Fed − TGA − RRP) • تغيّر 4 أسابيع', weight: 0.14, systemic: true, freq: 'weekly' },
+        { id: 'repoSofr', pillar: 1, name: 'فارق الريبو SOFR − IORB', weight: 0.12, systemic: true, freq: 'daily' },
+        { id: 'dxy', pillar: 1, name: 'الدولار الواسع (Broad USD) • تغيّر 3 أشهر', weight: 0.10, systemic: true, freq: 'weekly' },
         // Pillar 2: Credit & Yields
-        { id: 'hygOas', pillar: 2, name: 'فوارق السندات عالية العائد (HYG/OAS)', weight: 0.16, systemic: true, freq: 'daily' },
-        { id: 'yieldCurve', pillar: 2, name: 'منحنى العوائد (2s10s) وسرعة التغيّر', weight: 0.09, systemic: true, freq: 'daily' },
-        { id: 'flowsPensions', pillar: 2, name: 'تدفقات الصناديق ومراكز التقاعد', weight: 0.09, systemic: true, freq: 'weekly' },
+        { id: 'hygOas', pillar: 2, name: 'فوارق السندات عالية العائد (HY OAS)', weight: 0.16, systemic: true, freq: 'daily' },
+        { id: 'yieldCurve', pillar: 2, name: 'منحنى العوائد 2s10s • سرعة التغيّر 20 يوماً', weight: 0.09, systemic: true, freq: 'daily' },
+        { id: 'realYield', pillar: 2, name: 'العائد الحقيقي 10 سنوات (TIPS) • محرك الذهب', weight: 0.09, systemic: true, freq: 'daily' },
         // Pillar 3: Volatility & Market Internals
         { id: 'vix', pillar: 3, name: 'مؤشر الخوف والتقلب (VIX)', weight: 0.10, systemic: false, freq: 'daily' },
-        { id: 'breadth', pillar: 3, name: 'اتساع السوق (% فوق 50 و200 يوم)', weight: 0.08, systemic: false, freq: 'daily' },
-        { id: 'skewPcr', pillar: 3, name: 'مؤشر الذيل SKEW ونسبة Put/Call', weight: 0.06, systemic: false, freq: 'daily' },
-        { id: 'crossAsset', pillar: 3, name: 'ترابط الأصول وضغط الرافعة (OI)', weight: 0.06, systemic: false, freq: 'daily' }
+        { id: 'breadth', pillar: 3, name: 'اتساع السوق (RSP/SPY • 50 يوماً)', weight: 0.08, systemic: false, freq: 'daily' },
+        { id: 'skewPcr', pillar: 3, name: 'مؤشر الذيل SKEW', weight: 0.06, systemic: false, freq: 'daily' },
+        { id: 'crossAsset', pillar: 3, name: 'رافعة الكريبتو (OI لـ BTC مقابل 90 يوماً)', weight: 0.06, systemic: false, freq: 'daily' }
       ];
 
       // -----------------------------------------------------------------------
@@ -884,7 +884,9 @@
       // src: 'live' = real feed | 'sim' = placeholder baseline | 'manual' = what-if
       // -----------------------------------------------------------------------
       const DAY_MS = 24 * 60 * 60 * 1000;
-      const STALE_MS = { live: 10 * 60 * 1000, daily: 4 * DAY_MS, weekly: 10 * DAY_MS };
+      // Data dates lag publication (FRED daily ~1 business day; weekly series up to ~9 days) -> limits include that lag.
+      const STALE_MS = { live: 10 * 60 * 1000, daily: 6 * DAY_MS, weekly: 12 * DAY_MS };
+      const DATA_REFRESH_MS = 30 * 60 * 1000;
       const OI_DEADZONE = 0.10; // |%| below this is treated as "no change" in the 4-quadrant read
       const REGIME_SEVERITY = { expansion: 0, valuationDip: 1, earlyStress: 2, crisis: 3 };
 
@@ -897,19 +899,19 @@
       const SCENARIOS = {
         expansion: {
           label: 'استقرار وتوسع',
-          values: { netLiquidity: 18, repoSofr: 15, dxy: 24, hygOas: 16, yieldCurve: 20, flowsPensions: 18, vix: 18, breadth: 20, skewPcr: 22, crossAsset: 18 }
+          values: { netLiquidity: 18, repoSofr: 15, dxy: 24, hygOas: 16, yieldCurve: 20, realYield: 18, vix: 18, breadth: 20, skewPcr: 22, crossAsset: 18 }
         },
         valuationDip: {
           label: 'تصحيح تقييمات (فرصة)',
-          values: { netLiquidity: 28, repoSofr: 24, dxy: 36, hygOas: 30, yieldCurve: 34, flowsPensions: 35, vix: 48, breadth: 44, skewPcr: 42, crossAsset: 38 }
+          values: { netLiquidity: 28, repoSofr: 24, dxy: 36, hygOas: 30, yieldCurve: 34, realYield: 35, vix: 48, breadth: 44, skewPcr: 42, crossAsset: 38 }
         },
         earlyStress: {
           label: 'ضغط سيولة مبكر',
-          values: { netLiquidity: 62, repoSofr: 58, dxy: 66, hygOas: 60, yieldCurve: 58, flowsPensions: 61, vix: 62, breadth: 64, skewPcr: 59, crossAsset: 63 }
+          values: { netLiquidity: 62, repoSofr: 58, dxy: 66, hygOas: 60, yieldCurve: 58, realYield: 61, vix: 62, breadth: 64, skewPcr: 59, crossAsset: 63 }
         },
         crisis: {
           label: 'أزمة سيولة وائتمان',
-          values: { netLiquidity: 88, repoSofr: 92, dxy: 86, hygOas: 91, yieldCurve: 85, flowsPensions: 89, vix: 90, breadth: 88, skewPcr: 84, crossAsset: 91 }
+          values: { netLiquidity: 88, repoSofr: 92, dxy: 86, hygOas: 91, yieldCurve: 85, realYield: 89, vix: 90, breadth: 88, skewPcr: 84, crossAsset: 91 }
         }
       };
 
@@ -930,6 +932,8 @@
           obsSeq: 0       // increments only when a new real observation arrives
         },
         whatIfPrevCode: null,
+        seenObsKeys: new Set(),
+        dataFeed: { ok: false, at: null },
         macroPrices: {
           DXY: { price: 103.72, chg: 0.18 },
           VIX: { price: 21.45, chg: 1.85 },
@@ -1027,6 +1031,14 @@
       function provBadge(status) {
         const p = PROV_LABEL[status] || PROV_LABEL.sim;
         return `<span class="inline-block px-1.5 py-0 rounded-full text-[10px] font-bold border ${p.cls}">${p.txt}</span>`;
+      }
+
+      // Latest DATA date among systemic indicators (used for trend labels / transition stamps).
+      function obsDateLabel() {
+        const ts = INDICATORS_META.filter(i => i.systemic)
+          .map(i => (state.live.prov[i.id] && state.live.prov[i.id].ts) || 0);
+        const mx = Math.max(...ts);
+        return mx > 0 ? new Date(mx).toISOString().slice(0, 10) : getTimeStr();
       }
 
       // Decision-grade = every systemic indicator in the LIVE snapshot is live and fresh.
@@ -1139,6 +1151,8 @@
         let label, tone;
         if (gate.valid) {
           label = 'بيانات حقيقية • صالحة للقرار'; tone = 'emerald';
+        } else if (state.dataFeed && state.dataFeed.ok) {
+          label = `data.json متصل • ${gate.simCount + gate.staleCount} مؤشرات نظامية غير محدّثة`; tone = 'amber';
         } else if (cryptoLive) {
           label = `BTC/ETH حي (${source}) • الماكرو محاكى`; tone = 'amber';
         } else {
@@ -1208,7 +1222,7 @@
         // 3) No live source: values stay frozen and are labelled as simulated (no random drift).
         const btc = state.oiAssets.find(a => a.id === 'BTC');
         const eth = state.oiAssets.find(a => a.id === 'ETH');
-        [btc, eth].forEach(a => { if (a.src === 'live-price' && provStatus({ src: 'live', ts: a.ts }, 'live') === 'stale') a.src = 'sim'; });
+        [btc, eth].forEach(a => { if (a.src === 'live-price' && !a.feedDate && provStatus({ src: 'live', ts: a.ts }, 'live') === 'stale') a.src = 'sim'; });
         setConnStatus('sim', false);
         return false;
       }
@@ -1218,21 +1232,113 @@
       // obs = { values: {indicatorId: 0-100 score}, ts: epochMs, raw?: {netLiqB, hygOas, sofrBp, vix, dxy} }
       // Only this function advances obsSeq, so the 3/3 engine counts real observations only.
       // -----------------------------------------------------------------------
-      function ingestObservation(obs) {
+      // obs.prov (optional) = { indicatorId: dataDateMs } -> staleness is judged on the DATA date.
+      // opts.replay = true -> history replay on page load: advances the 3/3 engine silently (no popup/alert).
+      function ingestObservation(obs, opts = {}) {
         if (!obs || !obs.values || !obs.ts) return;
         Object.keys(obs.values).forEach(k => {
           if (!(k in state.live.values)) return;
-          state.live.values[k] = Number(obs.values[k]);
-          state.live.prov[k] = { src: 'live', ts: obs.ts };
+          const v = Number(obs.values[k]);
+          if (!Number.isFinite(v)) return;
+          state.live.values[k] = v;
+          state.live.prov[k] = { src: 'live', ts: (obs.prov && obs.prov[k]) || obs.ts };
         });
         if (obs.raw) state.live.raw = { ...obs.raw };
         state.live.obsSeq += 1;
-        if (state.mode === 'live') {
-          state.values = state.live.values;
-          renderAll({ newObservation: true });
-        }
+        if (state.mode === 'live') state.values = state.live.values;
+        // The engine always consumes live observations, even if the user is in what-if mode.
+        const prevMode = state.mode, prevValues = state.values;
+        state.mode = 'live'; state.values = state.live.values;
+        evaluateRegimeTransition(computeMetrics(), { newObservation: true, replay: !!opts.replay });
+        state.mode = prevMode; state.values = prevValues;
+        recordTrendPoint();
+        if (!opts.deferRender) renderAll();
       }
-      window.OpsRoom = { ingestObservation }; // exposed for Phase 2 loader / manual testing
+
+      function recordTrendPoint() {
+        const prevMode = state.mode, prevValues = state.values;
+        state.mode = 'live'; state.values = state.live.values;
+        const m = computeMetrics();
+        state.mode = prevMode; state.values = prevValues;
+        state.trendHistory.labels.push(obsDateLabel());
+        state.trendHistory.scores.push(m.composite);
+        if (state.trendHistory.labels.length > 60) {
+          state.trendHistory.labels.shift();
+          state.trendHistory.scores.shift();
+        }
+        if (trendChart) trendChart.update('none');
+      }
+
+      // -----------------------------------------------------------------------
+      // PHASE 2 LOADER: reads data.json written by GitHub Actions (scripts/fetch_data.py)
+      // Primary: raw.githubusercontent.com (updates without waiting for a Pages rebuild).
+      // Fallback: data.json next to this page.
+      // -----------------------------------------------------------------------
+      function dataUrls() {
+        const urls = [];
+        const host = location.hostname;
+        const m = host.match(/^([^.]+)\.github\.io$/i);
+        const repo = location.pathname.split('/').filter(Boolean)[0];
+        if (m && repo) urls.push(`https://raw.githubusercontent.com/${m[1]}/${repo}/main/data.json`);
+        urls.push('data.json');
+        return urls;
+      }
+
+      async function fetchDataJson() {
+        for (const u of dataUrls()) {
+          try {
+            const res = await fetch(`${u}?t=${Date.now()}`, { cache: 'no-store' });
+            if (res.ok) return await res.json();
+          } catch (_) {}
+        }
+        return null;
+      }
+
+      function applyMarketSnapshot(d) {
+        const assets = d.assets || {};
+        state.oiAssets.forEach(a => {
+          const x = assets[a.id];
+          if (!x || !Number.isFinite(Number(x.price))) return;
+          a.price = Number(x.price);
+          a.chg = Number(x.chg) || 0;
+          a.src = 'live-price';
+          a.ts = x.ts || null;
+          a.feedDate = x.date || '';
+          a.feedSource = x.source || '';
+          if (x.oiChg !== null && x.oiChg !== undefined && Number.isFinite(Number(x.oiChg))) {
+            a.oiChg = Number(x.oiChg);
+            a.oiLive = true;
+            a.oiSource = x.oiSource || '';
+          }
+        });
+        const sectors = d.sectors || {};
+        state.sectors.forEach(s => {
+          const x = sectors[s.code];
+          if (x && Number.isFinite(Number(x.perf))) { s.perf = Number(x.perf); s.live = true; s.date = x.date; }
+        });
+      }
+
+      async function loadDataJson(isInitial) {
+        const d = await fetchDataJson();
+        if (!d) {
+          state.dataFeed = { ok: false, at: Date.now() };
+          return false;
+        }
+        applyMarketSnapshot(d);
+        const recent = Array.isArray(d.recent) ? d.recent : [];
+        const fresh = recent.filter(o => o && o.obsKey && !state.seenObsKeys.has(o.obsKey));
+        fresh.forEach((o, i) => {
+          state.seenObsKeys.add(o.obsKey);
+          // On first load, every historical observation is replayed silently so the 3/3 engine
+          // starts from the true recent history instead of restarting at 0/3 on every page load.
+          ingestObservation({ values: o.values, ts: o.ts, raw: o.raw, prov: o.prov },
+            { replay: isInitial, deferRender: true });
+        });
+        state.dataFeed = { ok: true, at: Date.now(), generated: d.generated, errors: (d.errors || []).length };
+        return true;
+      }
+
+      window.OpsRoom = { ingestObservation, loadDataJson }; // exposed for testing
 
       function computeMetrics() {
         let weightedSum = 0;
@@ -1315,13 +1421,12 @@
           hygOas: Number((2.85 + v.hygOas * 0.055).toFixed(2)),
           sofrBp: Number((-2.4 + v.repoSofr * 0.34).toFixed(1)),
           vix: Number((12.0 + v.vix * 0.32).toFixed(2)),
-          dxy: Number((99.5 + v.dxy * 0.11).toFixed(2)),
+          dxy: Number((112 + v.dxy * 0.2).toFixed(2)),   // broad USD index scale (illustrative)
+          dxyPct: Math.round(v.dxy),
           curveBps: Math.round(-38 + v.yieldCurve * 1.1),
-          d50: Math.max(8, Math.round(86 - v.breadth * 0.72)),
-          d200: Math.max(14, Math.round(88 - v.breadth * 0.62)),
+          rspSpyChg: Number((3 - v.breadth * 0.08).toFixed(2)),
           skew: Math.round(118 + v.skewPcr * 0.4),
-          pcr: Number((0.68 + v.skewPcr * 0.0065).toFixed(2)),
-          flowsB: Number((16 - v.flowsPensions * 0.44).toFixed(1)),
+          realYield: Number((0.2 + v.realYield * 0.03).toFixed(2)),
           isLive: false
         };
         return useLive ? { ...derived, ...state.live.raw, isLive: true } : derived;
@@ -1333,8 +1438,9 @@
         const hygOasNum = raw.hygOas;
         const sofrBp = raw.sofrBp;
         const vixNum = raw.vix;
-        const dxyNum = raw.dxy;
+        const dxyPctNum = Number(raw.dxyPct);
 
+        // Thresholds are PROVISIONAL until Phase 3 (historical calibration).
         const gates = [
           {
             id: 'hyg',
@@ -1352,17 +1458,17 @@
           },
           {
             id: 'netLiq',
-            label: 'TGA/RRP ≤ -$80B',
+            label: 'صافي السيولة 4 أسابيع ≤ -$200B',
             current: `${netLiqB >= 0 ? '+' : ''}$${netLiqB}B`,
-            breached: netLiqB <= -80,
-            desc: `سحب سيولة خزانة حاد (${netLiqB} مليار دولار)`
+            breached: netLiqB <= -200,
+            desc: `سحب سيولة حاد (${netLiqB} مليار دولار خلال 4 أسابيع)`
           },
           {
             id: 'vixDxy',
-            label: 'VIX ≥ 30 & DXY ≥ 106',
-            current: `VIX ${vixNum.toFixed(1)} | DXY ${dxyNum.toFixed(1)}`,
-            breached: vixNum >= 30 && dxyNum >= 106,
-            desc: `قفزة مزدوجة في VIX (${vixNum.toFixed(1)}) والدولار (${dxyNum.toFixed(1)})`
+            label: 'VIX ≥ 30 & الدولار ≥ المئين 85',
+            current: `VIX ${vixNum.toFixed(1)} | الدولار م${Math.round(dxyPctNum)}`,
+            breached: vixNum >= 30 && dxyPctNum >= 85,
+            desc: `قفزة مزدوجة في VIX (${vixNum.toFixed(1)}) وصعود الدولار (المئين ${Math.round(dxyPctNum)})`
           }
         ];
 
@@ -1463,6 +1569,10 @@
               eng.candidateCode = null;
               eng.lastCauseLine = buildCauseLine(rawCode, m, gateEval);
               const newDecision = computeDecision(rawCode);
+              eng.lastTransitionAt = obsDateLabel();
+              if (opts.replay) {
+                // history replay on page load: state is restored silently, no popup / beep / alert
+              } else {
               if (eng.autoPopup) openRegimePopup(prevCode, rawCode, gateEval, newDecision, eng.lastCauseLine, false);
               const escalation = prevCode !== null && REGIME_SEVERITY[rawCode] > REGIME_SEVERITY[prevCode];
               triggerAlert(
@@ -1472,6 +1582,7 @@
                 eng.lastCauseLine,
                 { key: `regime_${rawCode}`, bypassCooldown: escalation }
               );
+              }
             }
           }
         }
@@ -1810,8 +1921,8 @@
             <td class="py-2.5 px-2 font-extrabold tabular-nums ${pCls}">${fmtPct(a.chg)}</td>
             <td class="py-2.5 px-2 font-extrabold tabular-nums ${oiCls}">${fmtPct(a.oiChg)}</td>
             <td class="py-2.5 px-2"><span class="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold border ${reg.cls}">${reg.label}</span></td>
-            <td class="py-2.5 px-2 whitespace-nowrap">${a.src === 'live-price'
-              ? `${provBadge('live')} <span class="text-[10px] text-slate-500">السعر فقط • OI ${provBadge('sim')}</span>`
+            <td class="py-2.5 px-2 whitespace-nowrap text-[10px] text-slate-500">${a.src === 'live-price'
+              ? `${provBadge('live')} ${a.feedSource || 'متصفح'}${a.feedDate ? ' • ' + a.feedDate : ''}<br>OI: ${a.oiLive ? provBadge('live') + ' ' + (a.oiSource || '') : provBadge('sim')}`
               : provBadge('sim')}</td>
           </tr>`;
         }).join('');
@@ -1926,7 +2037,7 @@
             ${isAnom ? `<span class="absolute top-2 left-2 w-2.5 h-2.5 rounded-full ${isPos ? 'bg-emerald-400' : 'bg-rose-500'} animate-ping"></span>` : ''}
             <div class="flex items-center justify-between text-[11px]">
               <span class="font-black text-slate-300">${sec.code}</span>
-              <span class="text-slate-400">${sec.type === 'cyc' ? 'دوري' : 'دفاعي'}</span>
+              <span class="text-slate-400">${sec.type === 'cyc' ? 'دوري' : 'دفاعي'}${sec.live ? '' : ' • <span class="text-slate-500 font-black">SIM</span>'}</span>
             </div>
             <div class="text-xs font-extrabold text-white truncate">${sec.name}</div>
             <div class="text-sm font-black tabular-nums ${txt}">${fmtPct(sec.perf)}</div>
@@ -1960,11 +2071,10 @@
         const vixNum = raw.vix;
         const sofrBp = raw.sofrBp;
         const curveBps = raw.curveBps;
-        const d50 = raw.d50;
-        const d200 = raw.d200;
+        const rspSpy = Number(raw.rspSpyChg);
         const skewNum = raw.skew;
-        const pcrNum = raw.pcr;
-        const flowsB = raw.flowsB;
+        const realY = Number(raw.realYield);
+        const sv = state.values; // 0-100 stress percentiles
         // Every copied/quoted text is stamped when it is not built from decision-grade data.
         const plainStamp = state.mode !== 'live'
           ? '[افتراضي — اختبار ضغط، ليس قراءة سوق] '
@@ -1973,15 +2083,15 @@
         const tComp = mkTag(`${risk.badge} • ${risk.title}`, risk.tone);
         const tSys = evalScoreTag(m.systemicStress, 'منضبط • إيجابي ومطمئن', 'متوسط • مراقبة حذرة', 'مرتفع • سلبي / ضغط نظامي');
         const tVal = evalScoreTag(m.valuationStress, 'هادئ • إيجابي', 'متوسط • حذر انتقائي', 'تقلب حاد • سلبي');
-        const tNetLiq = netLiqB >= 20 ? mkTag('ضخ سيولة • إيجابي', 'pos') : netLiqB >= -30 ? mkTag('توازن سيولة • محايد', 'neu') : mkTag('سحب سيولة حاد • سلبي', 'neg');
+        const tNetLiq = evalScoreTag(sv.netLiquidity, 'ضخ سيولة • إيجابي', 'توازن سيولة • محايد', 'سحب سيولة حاد • سلبي');
         const tHyg = hygOasNum <= 3.8 ? mkTag('منخفض ومستقر • إيجابي', 'pos') : hygOasNum <= 4.7 ? mkTag('معتدل إلى مرتفع نسبياً • حذر', 'neu') : mkTag('مرتفع وضاغط • سلبي / تحذير ائتماني', 'neg');
-        const tDxy = dxyNum <= 102 ? mkTag('هادئ وداعم للأسواق • إيجابي', 'pos') : dxyNum <= 105.5 ? mkTag('معتدل • محايد', 'neu') : mkTag('مرتفع وضاغط • سلبي', 'neg');
+        const tDxy = evalScoreTag(sv.dxy, 'هادئ وداعم للأسواق • إيجابي', 'معتدل • محايد', 'صعود ضاغط • سلبي');
         const tVix = vixNum < 18 ? mkTag('هادئ ومطمئن • إيجابي', 'pos') : vixNum < 24 ? mkTag('متوسط • حذر انتقائي', 'neu') : mkTag('مرتفع • سلبي / تقلب حاد', 'neg');
         const tSofr = sofrBp <= 2 ? mkTag('تمويل مصرفي سلس • إيجابي', 'pos') : sofrBp <= 10 ? mkTag('تشدد طفيف • حذر', 'neu') : mkTag('اختناق تمويلي في الريبو • سلبي', 'neg');
         const tCurve = evalScoreTag(state.values.yieldCurve, 'عوائد هادئة • إيجابي', 'تذبذب معتدل • محايد', 'تسارع مقلق بالعوائد • سلبي');
-        const tFlows = flowsB >= 3 ? mkTag('تدفقات مؤسسية داخلة • إيجابي', 'pos') : flowsB >= -6 ? mkTag('إعادة توازن روتينية • محايد', 'neu') : mkTag('تخارج واستردادات • سلبي', 'neg');
-        const tBreadth = d50 >= 60 ? mkTag('مشاركة واسعة وصحية • إيجابي', 'pos') : d50 >= 40 ? mkTag('اتساع متوسط • حذر', 'neu') : mkTag('ضعف داخلي وتباعد • سلبي', 'neg');
-        const tSkew = (skewNum < 132 && pcrNum < 0.9) ? mkTag('تحوط طبيعي منخفض • إيجابي', 'pos') : (skewNum < 145 && pcrNum < 1.05) ? mkTag('طلب تحوط متوازن • محايد', 'neu') : mkTag('تحوط مرتفع ضد الهبوط • سلبي / حذر', 'neg');
+        const tReal = evalScoreTag(sv.realYield, 'عائد حقيقي منخفض • داعم للذهب', 'معتدل • محايد', 'عائد حقيقي مرتفع • ضاغط على الذهب');
+        const tBreadth = evalScoreTag(sv.breadth, 'مشاركة واسعة وصحية • إيجابي', 'اتساع متوسط • حذر', 'ضعف داخلي وتباعد • سلبي');
+        const tSkew = evalScoreTag(sv.skewPcr, 'تحوط طبيعي منخفض • إيجابي', 'طلب تحوط متوازن • محايد', 'تحوط مرتفع ضد الهبوط • سلبي / حذر');
         const tGc = evalAssetOiTag(gc);
         const tCl = evalAssetOiTag(cl);
         const tBtc = evalAssetOiTag(btc);
@@ -1990,7 +2100,7 @@
         const tDecision = decision.code === 'invalid' ? mkTag('لا يوجد حكم • بيانات غير صالحة', 'neu') : decision.code === 'expansion' ? mkTag('بيئة شراء وتوسع • إيجابي', 'pos') : decision.code === 'valuationDip' ? mkTag('قاع تجميعي محتمل • حذر إيجابي', 'neu') : mkTag('احتمال فخ هبوطي • سلبي / حماية الكاش', 'neg');
 
         document.getElementById('reportTimestampMeta').textContent =
-          `آخر توليد ${getTimeStr()} | المؤشر المركب: ${m.composite}/100 (${risk.title}) | البيانات: ${state.mode !== 'live' ? 'افتراضية (اختبار ضغط)' : raw.isLive ? 'حقيقية' : 'محاكاة'}`;
+          `آخر توليد ${getTimeStr()}${state.dataFeed && state.dataFeed.generated ? ' | آخر تحديث للبيانات: ' + state.dataFeed.generated.replace('T', ' ').replace('Z', ' UTC') : ''} | المؤشر المركب: ${m.composite}/100 (${risk.title}) | البيانات: ${state.mode !== 'live' ? 'افتراضية (اختبار ضغط)' : raw.isLive ? 'حقيقية' : 'محاكاة'}`;
 
         const setPart = (idx, title, htmlContent, plainContent) => {
           const el = document.getElementById(`reportPart${idx}`);
@@ -2007,18 +2117,17 @@
           `يسجل مؤشر الإنذار المبكر المركب ${m.composite} من 100 ${tComp.plain}. ويبلغ ضغط السيولة والتمويل النظامي ${m.systemicStress}% ${tSys.plain} مقابل ضغط التقلب والتقييمات ${m.valuationStress}% ${tVal.plain}. ${p1Tail}`
         );
 
-        const liqStr = `${netLiqB >= 0 ? '+' : ''}${netLiqB} مليار دولار`;
+        const liqStr = `${netLiqB >= 0 ? '+' : ''}${netLiqB} مليار دولار خلال 4 أسابيع`;
         setPart(2, 'قراءة المؤشرات القيادية (السيولة، السندات، الدولار، والتقلب)',
-          `تُظهر قراءة صافي سيولة الخزانة (TGA/RRP) تغيراً بحدود <strong class="tabular-nums text-white">${liqStr}</strong> ${tNetLiq.html}، بينما تقف فوارق السندات عالية العائد (HY OAS) عند <strong class="tabular-nums text-white">${hygOasNum.toFixed(2)}%</strong> ${tHyg.html}، ومؤشر الدولار (DXY) عند <strong class="tabular-nums text-white">${dxyNum.toFixed(2)}</strong> ${tDxy.html}، ومؤشر الخوف (VIX) عند <strong class="tabular-nums text-white">${vixNum.toFixed(2)}</strong> ${tVix.html}.`,
-          `تُظهر قراءة صافي سيولة الخزانة (TGA/RRP) تغيراً بحدود ${liqStr} ${tNetLiq.plain}، بينما تقف فوارق السندات عالية العائد (HY OAS) عند ${hygOasNum.toFixed(2)}% ${tHyg.plain}، ومؤشر الدولار (DXY) عند ${dxyNum.toFixed(2)} ${tDxy.plain}، ومؤشر الخوف (VIX) عند ${vixNum.toFixed(2)} ${tVix.plain}.`
+          `تُظهر قراءة صافي السيولة (الفيدرالي − TGA − RRP) تغيراً بحدود <strong class="tabular-nums text-white">${liqStr}</strong> ${tNetLiq.html}، بينما تقف فوارق السندات عالية العائد (HY OAS) عند <strong class="tabular-nums text-white">${hygOasNum.toFixed(2)}%</strong> ${tHyg.html}، والدولار الواسع عند <strong class="tabular-nums text-white">${dxyNum.toFixed(2)}</strong> (المئين ${Math.round(sv.dxy)}) ${tDxy.html}، ومؤشر الخوف (VIX) عند <strong class="tabular-nums text-white">${vixNum.toFixed(2)}</strong> ${tVix.html}.`,
+          `تُظهر قراءة صافي السيولة (الفيدرالي − TGA − RRP) تغيراً بحدود ${liqStr} ${tNetLiq.plain}، بينما تقف فوارق السندات عالية العائد (HY OAS) عند ${hygOasNum.toFixed(2)}% ${tHyg.plain}، والدولار الواسع عند ${dxyNum.toFixed(2)} (المئين ${Math.round(sv.dxy)}) ${tDxy.plain}، ومؤشر الخوف (VIX) عند ${vixNum.toFixed(2)} ${tVix.plain}.`
         );
 
         const sofrStr = `${sofrBp >= 0 ? '+' : ''}${sofrBp} نقطة أساس`;
         const curveStr = `${curveBps >= 0 ? '+' : ''}${curveBps} نقطة أساس`;
-        const flowsStr = `${flowsB >= 0 ? '+' : ''}${flowsB} مليار دولار`;
         setPart(3, 'صحة السوق الداخلية والتمويل المصرفي والتحوط',
-          `يسجل فارق التمويل المصرفي والريبو (SOFR-IORB) نحو <strong class="tabular-nums text-white">${sofrStr}</strong> ${tSofr.html}، ومنحنى العوائد (2s10s) عند <strong class="tabular-nums text-white">${curveStr}</strong> ${tCurve.html}، فيما تبلغ تدفقات الصناديق والتقاعد <strong class="tabular-nums text-white">${flowsStr}</strong> ${tFlows.html}. وداخلياً يبلغ اتساع السوق فوق متوسط 50 و200 يوم <strong class="tabular-nums text-white">${d50}% / ${d200}%</strong> ${tBreadth.html}، مع مؤشر الذيل SKEW عند <strong class="tabular-nums text-white">${skewNum}</strong> ونسبة Put/Call عند <strong class="tabular-nums text-white">${pcrNum.toFixed(2)}</strong> ${tSkew.html}.`,
-          `يسجل فارق التمويل المصرفي والريبو (SOFR-IORB) نحو ${sofrStr} ${tSofr.plain}، ومنحنى العوائد (2s10s) عند ${curveStr} ${tCurve.plain}، فيما تبلغ تدفقات الصناديق والتقاعد ${flowsStr} ${tFlows.plain}. وداخلياً يبلغ اتساع السوق فوق متوسط 50 و200 يوم ${d50}% / ${d200}% ${tBreadth.plain}، مع مؤشر الذيل SKEW عند ${skewNum} ونسبة Put/Call عند ${pcrNum.toFixed(2)} ${tSkew.plain}.`
+          `يسجل فارق التمويل المصرفي والريبو (SOFR-IORB) نحو <strong class="tabular-nums text-white">${sofrStr}</strong> ${tSofr.html}، ومنحنى العوائد (2s10s) عند <strong class="tabular-nums text-white">${curveStr}</strong> ${tCurve.html}، فيما يبلغ العائد الحقيقي لـ 10 سنوات <strong class="tabular-nums text-white">${realY.toFixed(2)}%</strong> ${tReal.html}. وداخلياً بلغ أداء السهم المتساوي مقابل المرجّح (RSP/SPY) خلال 50 يوماً <strong class="tabular-nums text-white">${fmtPct(rspSpy)}</strong> ${tBreadth.html}، مع مؤشر الذيل SKEW عند <strong class="tabular-nums text-white">${skewNum}</strong> ${tSkew.html}.`,
+          `يسجل فارق التمويل المصرفي والريبو (SOFR-IORB) نحو ${sofrStr} ${tSofr.plain}، ومنحنى العوائد (2s10s) عند ${curveStr} ${tCurve.plain}، فيما يبلغ العائد الحقيقي لـ 10 سنوات ${realY.toFixed(2)}% ${tReal.plain}. وداخلياً بلغ أداء السهم المتساوي مقابل المرجّح (RSP/SPY) خلال 50 يوماً ${fmtPct(rspSpy)} ${tBreadth.plain}، مع مؤشر الذيل SKEW عند ${skewNum} ${tSkew.plain}.`
         );
 
         setPart(4, 'قراءة العقود المفتوحة (Open Interest) للسلع والذهب والكريبتو',
@@ -2064,7 +2173,7 @@
         const c1 = decision.code === 'invalid'
           ? `${decision.title} — لا إجابة على سؤال "قاع أم فخ؟" قبل توفر بيانات حقيقية.`
           : `${decision.title} — الإجابة: ${decision.code === 'crisis' || decision.code === 'earlyStress' ? 'احتمال فخ هبوطي مرتفع (الأولوية لحماية الكاش).' : 'بيئة مناسبة للتجميع المنضبط دون أزمة ائتمان.'}`;
-        const c2 = `ضغط السيولة والائتمان ${m.systemicStress}% ${tSys.plain} | HY OAS عند ${hygOasNum.toFixed(2)}% | DXY عند ${dxyNum.toFixed(2)}.`;
+        const c2 = `ضغط السيولة والائتمان ${m.systemicStress}% ${tSys.plain} | HY OAS عند ${hygOasNum.toFixed(2)}% | الدولار الواسع ${dxyNum.toFixed(2)} | العائد الحقيقي ${realY.toFixed(2)}%.`;
         const c3 = `${decision.oiHealthTitle} — الذهب OI ${fmtPct(gc.oiChg)} | النفط OI ${fmtPct(cl.oiChg)} | BTC OI ${fmtPct(btc.oiChg)}.`;
         const c4 = `نسبة الكاش المستهدفة ${decision.cashPct} | التحوط: ${decision.hedgeTitle} | السندات: ${decision.permBonds.text}.`;
 
@@ -2269,16 +2378,7 @@
         const sectorStats = renderSectors();
         updateFullReportAndBrief(m, decision, sectorStats);
 
-        // Trend chart records ONLY real observations in live mode (no slider/render noise).
-        if (opts.newObservation && state.mode === 'live') {
-          state.trendHistory.labels.push(getTimeStr());
-          state.trendHistory.scores.push(m.composite);
-          if (state.trendHistory.labels.length > 60) {
-            state.trendHistory.labels.shift();
-            state.trendHistory.scores.shift();
-          }
-          if (trendChart) trendChart.update('none');
-        }
+        // Trend chart points are recorded in ingestObservation() — only for real observations.
         const note = document.getElementById('trendNote');
         if (note) {
           note.textContent = state.trendHistory.scores.length === 0
@@ -2326,7 +2426,8 @@
       function bindEvents() {
         // Reconnect
         document.getElementById('reconnectBtn').addEventListener('click', async () => {
-          showToast('جاري فحص مصادر البث المباشر...');
+          showToast('جاري فحص مصادر البيانات...');
+          await loadDataJson(false);
           await probeLiveCryptoApis();
           renderAll();
         });
@@ -2473,9 +2574,13 @@
         bindEvents();
         enterLiveMode();
         renderAll();
+        await loadDataJson(true);      // Phase 2: real data + silent replay of recent observations
         await probeLiveCryptoApis();
         renderAll();
         startLoop();
+        setInterval(async () => {      // data.json is refreshed by GitHub Actions twice a day
+          if (await loadDataJson(false)) renderAll();
+        }, DATA_REFRESH_MS);
       });
     })();
   </script>
