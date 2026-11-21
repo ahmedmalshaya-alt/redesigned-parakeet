@@ -1588,12 +1588,14 @@
         }
 
         if (eng.confirmedCode === null) {
+          const cand = eng.candidateCode ? computeDecision(eng.candidateCode).shortName : '—';
           return {
-            confirmedCode: 'invalid',
+            confirmedCode: 'pending',
+            candidateCode: eng.candidateCode,
             gateEval,
             statusBadge: `قيد التحقق المؤسسي (${eng.persistenceCount}/${eng.requiredPersistence} قراءات)`,
             isPending: true,
-            causeLine: 'البيانات حقيقية، لكن لم تكتمل 3 قراءات متتالية متطابقة لتأكيد الحكم الأول.'
+            causeLine: `البيانات حقيقية ✓ • القراءة الحالية تشير إلى: ${cand} • تحتاج ${eng.requiredPersistence - eng.persistenceCount} قراءة إضافية (يوم تداول جديد لكل قراءة) قبل اعتماد الحكم ونسبة الكاش.`
           };
         }
 
@@ -1610,6 +1612,27 @@
       }
 
       function computeDecision(code) {
+        if (code === 'pending') {
+          const eng = state.regimeEngine;
+          const cand = eng.candidateCode ? computeDecision(eng.candidateCode) : null;
+          return {
+            ...computeDecision('invalid'),
+            code: 'pending',
+            shortName: 'قيد التأكيد',
+            title: `بيانات حقيقية — الحكم قيد التأكيد (${eng.persistenceCount}/${eng.requiredPersistence})`,
+            desc: cand
+              ? `القراءة المبدئية من بيانات اليوم: «${cand.title}». لا تُعرض نسبة الكاش ولا أذون الدخول قبل ثبات الحكم ${eng.requiredPersistence} قراءات متتالية، منعاً لقرارات مبنية على يوم واحد.`
+              : 'بانتظار أول قراءة كاملة للمؤشرات النظامية.',
+            bannerCls: 'bg-cyan-500/10 border-cyan-500/40',
+            titleCls: 'text-cyan-300',
+            oiHealthTitle: 'قيد التأكيد',
+            rules: [
+              'البيانات حقيقية ومحدّثة؛ الحكم المبدئي معروض للاطلاع فقط.',
+              `اعتماد الحكم ونسبة الكاش يتم بعد ${eng.requiredPersistence} قراءات متطابقة في أيام تداول مختلفة.`,
+              'تحقق من البوابات المصرفية الأربع في الأعلى: أي اختراق يغيّر القراءة المبدئية فوراً.'
+            ]
+          };
+        }
         if (code === 'invalid' || code === null || code === undefined) {
           return {
             code: 'invalid',
@@ -1806,6 +1829,9 @@
         if (state.mode !== 'live') {
           msg = 'وضع اختبار الضغط الافتراضي: جميع القيم والأحكام أدناه افتراضية لاختبار المنطق، وليست قراءة سوق.';
           cls = 'bg-violet-500/10 border-violet-500/40 text-violet-300';
+        } else if (evalResult.confirmedCode === 'pending') {
+          msg = evalResult.causeLine;
+          cls = 'bg-cyan-500/10 border-cyan-500/40 text-cyan-300';
         } else if (evalResult.confirmedCode === 'invalid') {
           msg = `غير صالح للقرار: ${evalResult.causeLine}`;
           cls = 'bg-amber-500/10 border-amber-500/40 text-amber-300';
@@ -1814,6 +1840,7 @@
           bar.textContent = msg;
           bar.className = msg ? `rounded-xl px-4 py-3 border text-xs sm:text-sm font-extrabold ${cls}` : 'hidden';
         }
+        if (evalResult.confirmedCode === 'pending' && state.mode === 'live') msg = msg && null; // real data: no "illustrative" warning on the report
         if (rbar) {
           rbar.textContent = msg ? `تنبيه: الأرقام في هذا التقرير توضيحية وليست قراءات سوق حقيقية — ${state.mode !== 'live' ? 'وضع افتراضي' : 'بيانات محاكاة'}.` : '';
           rbar.className = msg ? 'rounded-xl px-4 py-2.5 border border-amber-500/40 bg-amber-500/10 text-amber-300 text-xs font-extrabold' : 'hidden';
@@ -2097,7 +2124,7 @@
         const tBtc = evalAssetOiTag(btc);
         const tEs = evalAssetOiTag(es);
         const tSecSpread = sectorStats.spread >= 0.35 ? mkTag('تدوير صعودي داعم • إيجابي', 'pos') : sectorStats.spread <= -0.35 ? mkTag('هروب للدفاعي • سلبي / حذر', 'neg') : mkTag('تدوير متوازن • محايد', 'neu');
-        const tDecision = decision.code === 'invalid' ? mkTag('لا يوجد حكم • بيانات غير صالحة', 'neu') : decision.code === 'expansion' ? mkTag('بيئة شراء وتوسع • إيجابي', 'pos') : decision.code === 'valuationDip' ? mkTag('قاع تجميعي محتمل • حذر إيجابي', 'neu') : mkTag('احتمال فخ هبوطي • سلبي / حماية الكاش', 'neg');
+        const tDecision = decision.code === 'pending' ? mkTag('حكم مبدئي • قيد التأكيد', 'neu') : decision.code === 'invalid' ? mkTag('لا يوجد حكم • بيانات غير صالحة', 'neu') : decision.code === 'expansion' ? mkTag('بيئة شراء وتوسع • إيجابي', 'pos') : decision.code === 'valuationDip' ? mkTag('قاع تجميعي محتمل • حذر إيجابي', 'neu') : mkTag('احتمال فخ هبوطي • سلبي / حماية الكاش', 'neg');
 
         document.getElementById('reportTimestampMeta').textContent =
           `آخر توليد ${getTimeStr()}${state.dataFeed && state.dataFeed.generated ? ' | آخر تحديث للبيانات: ' + state.dataFeed.generated.replace('T', ' ').replace('Z', ' UTC') : ''} | المؤشر المركب: ${m.composite}/100 (${risk.title}) | البيانات: ${state.mode !== 'live' ? 'افتراضية (اختبار ضغط)' : raw.isLive ? 'حقيقية' : 'محاكاة'}`;
@@ -2168,9 +2195,11 @@
         setExecBadge('execBadge1', tDecision.tone === 'pos' ? 'إيجابي' : tDecision.tone === 'neg' ? 'سلبي' : 'حذر', tDecision.tone);
         setExecBadge('execBadge2', tSys.tone === 'pos' ? 'إيجابي' : tSys.tone === 'neg' ? 'سلبي' : 'محايد', tSys.tone);
         setExecBadge('execBadge3', m.flushCount >= 3 ? 'سلبي' : m.longBuildCount >= 4 ? 'إيجابي' : 'محايد', m.flushCount >= 3 ? 'neg' : m.longBuildCount >= 4 ? 'pos' : 'neu');
-        setExecBadge('execBadge4', decision.code === 'invalid' ? 'معلّق' : decision.code === 'crisis' ? 'دفاعي' : 'انضباط', decision.code === 'invalid' ? 'neu' : decision.code === 'crisis' ? 'neg' : 'pos');
+        setExecBadge('execBadge4', (decision.code === 'invalid' || decision.code === 'pending') ? 'معلّق' : decision.code === 'crisis' ? 'دفاعي' : 'انضباط', (decision.code === 'invalid' || decision.code === 'pending') ? 'neu' : decision.code === 'crisis' ? 'neg' : 'pos');
 
-        const c1 = decision.code === 'invalid'
+        const c1 = decision.code === 'pending'
+          ? `${decision.title} — ${decision.desc}`
+          : decision.code === 'invalid'
           ? `${decision.title} — لا إجابة على سؤال "قاع أم فخ؟" قبل توفر بيانات حقيقية.`
           : `${decision.title} — الإجابة: ${decision.code === 'crisis' || decision.code === 'earlyStress' ? 'احتمال فخ هبوطي مرتفع (الأولوية لحماية الكاش).' : 'بيئة مناسبة للتجميع المنضبط دون أزمة ائتمان.'}`;
         const c2 = `ضغط السيولة والائتمان ${m.systemicStress}% ${tSys.plain} | HY OAS عند ${hygOasNum.toFixed(2)}% | الدولار الواسع ${dxyNum.toFixed(2)} | العائد الحقيقي ${realY.toFixed(2)}%.`;
