@@ -79,7 +79,10 @@ def yahoo(sym):
     last = None
     for host in ("query1", "query2"):
         try:
-            url = f"https://{host}.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(sym)}?range=max&interval=1d"
+            # NOTE: range=max silently downgrades to MONTHLY bars -> always pass explicit period1/period2 for daily data
+            p2 = int(time.time())
+            url = (f"https://{host}.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(sym)}"
+                   f"?period1=946684800&period2={p2}&interval=1d&events=div%2Csplit")
             r = json.loads(http(url, retries=1))["chart"]["result"][0]
             off = int(r["meta"].get("gmtoffset", 0))
             closes = r["indicators"].get("adjclose", [{}])[0].get("adjclose") or r["indicators"]["quote"][0]["close"]
@@ -149,11 +152,19 @@ class AsOf:
 
 
 # ------------------------------------------------------------------ build daily panel
+def assert_daily(name, series, min_rows):
+    """Guard against silent frequency downgrades (the bug that hit run #1)."""
+    if len(series) < min_rows:
+        raise RuntimeError(f"{name}: only {len(series)} rows — expected daily data (>= {min_rows})")
+
+
 def build_panel():
     F = {sid: fred(sid) for sid in ["WALCL", "WTREGEN", "RRPONTSYD", "SOFR", "IORB", "IOER", "DTWEXBGS",
                                     "BAMLH0A0HYM2", "T10Y2Y", "DFII10", "VIXCLS", "DTB3"]}
     spy, gold, rsp = yahoo("SPY"), yahoo("GC=F"), yahoo("RSP")
     skew = cboe_skew()
+    assert_daily("SPY", spy, 5000); assert_daily("GC=F", gold, 4000); assert_daily("RSP", rsp, 4000)
+    assert_daily("SKEW", skew, 5000); assert_daily("VIXCLS", F["VIXCLS"], 5000)
 
     # --- indicator series (native frequency), then lag to availability date
     net = []

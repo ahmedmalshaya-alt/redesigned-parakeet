@@ -112,11 +112,15 @@ def fred(sid):
 
 
 def yahoo(sym, rng="5y"):
-    """Yahoo Finance chart API (unofficial, free, no key). Dates in the exchange's local calendar."""
+    """Yahoo Finance chart API (unofficial, free, no key). Dates in the exchange's local calendar.
+    Explicit period1/period2 guarantees DAILY bars (some 'range' values silently return weekly/monthly)."""
     last = None
+    years = {"5y": 5, "1mo": 1 / 12}.get(rng, 5)
+    p2 = int(time.time()); p1 = p2 - int(years * 365.25 * 86400) - 7 * 86400
     for host in ("query1", "query2"):
         try:
-            url = f"https://{host}.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(sym)}?range={rng}&interval=1d"
+            url = (f"https://{host}.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(sym)}"
+                   f"?period1={p1}&period2={p2}&interval=1d")
             r = json.loads(http(url, retries=1))["chart"]["result"][0]
             off = int(r["meta"].get("gmtoffset", 0))
             closes = r["indicators"]["quote"][0]["close"]
