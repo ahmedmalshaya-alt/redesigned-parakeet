@@ -1,8 +1,8 @@
 {
  "schema": 1,
- "generated": "2026-11-22T22:55:39Z",
- "generatedTs": 1795388139845,
- "obsKey": "netLiquidity:2026-11-18|repoSofr:2026-11-19|dxy:2026-11-22|hygOas:2026-11-19|yieldCurve:2026-11-20|realYield:2026-11-19",
+ "generated": "2026-11-23T14:32:24Z",
+ "generatedTs": 1795444344491,
+ "obsKey": "netLiquidity:2026-11-18|repoSofr:2026-11-20|dxy:2026-11-23|hygOas:2026-11-19|yieldCurve:2026-11-20|realYield:2026-11-19",
  "indicators": {
   "netLiquidity": {
    "score": 44.6,
@@ -13,17 +13,17 @@
    "n": 156
   },
   "repoSofr": {
-   "score": 85.5,
-   "date": "2026-11-19",
-   "ts": 1795046400000,
+   "score": 88.7,
+   "date": "2026-11-20",
+   "ts": 1795132800000,
    "source": "FRED",
    "freq": "daily",
    "n": 756
   },
   "dxy": {
-   "score": 95.3,
-   "date": "2026-11-22",
-   "ts": 1795305600000,
+   "score": 96.1,
+   "date": "2026-11-23",
+   "ts": 1795392000000,
    "source": "Yahoo (DXY)",
    "freq": "daily",
    "n": 756
@@ -53,9 +53,9 @@
    "n": 756
   },
   "vix": {
-   "score": 99.1,
-   "date": "2026-11-20",
-   "ts": 1795132800000,
+   "score": 96.2,
+   "date": "2026-11-23",
+   "ts": 1795392000000,
    "source": "Yahoo",
    "freq": "daily",
    "n": 756
@@ -69,9 +69,9 @@
    "n": 756
   },
   "breadth": {
-   "score": 0.3,
-   "date": "2026-11-20",
-   "ts": 1795132800000,
+   "score": 8.5,
+   "date": "2026-11-23",
+   "ts": 1795392000000,
    "source": "Yahoo",
    "freq": "daily",
    "n": 756
@@ -88,94 +88,94 @@
  "raw": {
   "netLiqB": 23,
   "netLiqLevelB": 5825,
-  "sofrBp": 1.0,
-  "dxy": 103.84,
-  "dxyPct": 95.3,
+  "sofrBp": 2.0,
+  "dxy": 104.11,
+  "dxyPct": 96.1,
   "hygOas": 3.52,
   "curveBps": 29,
   "realYield": 2.88,
-  "vix": 35.89,
+  "vix": 27.03,
   "skew": 138.8,
-  "rspSpyChg": 6.97
+  "rspSpyChg": 3.8
  },
  "assets": {
   "BTC": {
-   "price": 60987.5,
-   "chg": 1.45,
-   "oiChg": 3.84,
-   "date": "2026-11-22",
-   "ts": 1795388139845,
+   "price": 63879.4,
+   "chg": 5.41,
+   "oiChg": -7.66,
+   "date": "2026-11-23",
+   "ts": 1795444344491,
    "source": "Hyperliquid",
    "oiSource": "Hyperliquid (24h)"
   },
   "ETH": {
-   "price": 1717.5,
-   "chg": 2.24,
-   "oiChg": -0.81,
-   "date": "2026-11-22",
-   "ts": 1795388139845,
+   "price": 1826.38,
+   "chg": 7.28,
+   "oiChg": 0.86,
+   "date": "2026-11-23",
+   "ts": 1795444344491,
    "source": "Hyperliquid",
    "oiSource": "Hyperliquid (24h)"
   },
   "GC": {
-   "price": 3515.3999,
-   "chg": -4.62,
-   "date": "2026-11-20",
-   "ts": 1795132800000,
+   "price": 3678.6001,
+   "chg": 4.64,
+   "date": "2026-11-23",
+   "ts": 1795392000000,
    "source": "Yahoo",
    "oiChg": 0.77,
    "oiSource": "CFTC COT أسبوعي (2026-11-17)"
   },
   "SI": {
-   "price": 41.07,
-   "chg": -7.33,
-   "date": "2026-11-20",
-   "ts": 1795132800000,
+   "price": 43.63,
+   "chg": 6.32,
+   "date": "2026-11-23",
+   "ts": 1795392000000,
    "source": "Yahoo",
    "oiChg": 6.31,
    "oiSource": "CFTC COT أسبوعي (2026-11-17)"
   },
   "CL": {
-   "price": 83.41,
-   "chg": 0.24,
-   "date": "2026-11-20",
-   "ts": 1795132800000,
+   "price": 82.03,
+   "chg": -2.32,
+   "date": "2026-11-23",
+   "ts": 1795392000000,
    "source": "Yahoo",
    "oiChg": -2.49,
    "oiSource": "CFTC COT أسبوعي (2026-11-17)"
   },
   "HG": {
-   "price": 5.485,
-   "chg": -2.49,
-   "date": "2026-11-20",
-   "ts": 1795132800000,
+   "price": 5.707,
+   "chg": 4.2,
+   "date": "2026-11-23",
+   "ts": 1795392000000,
    "source": "Yahoo",
    "oiChg": 0.28,
    "oiSource": "CFTC COT أسبوعي (2026-11-17)"
   },
   "ES": {
-   "price": 6935.0,
-   "chg": -3.64,
-   "date": "2026-11-20",
-   "ts": 1795132800000,
+   "price": 7256.0,
+   "chg": 4.63,
+   "date": "2026-11-23",
+   "ts": 1795392000000,
    "source": "Yahoo",
    "oiChg": 3.93,
    "oiSource": "CFTC COT أسبوعي (2026-11-17)"
   },
   "NQ": {
-   "price": 25126.5,
-   "chg": -5.54,
-   "date": "2026-11-20",
-   "ts": 1795132800000,
+   "price": 26878.5,
+   "chg": 6.97,
+   "date": "2026-11-23",
+   "ts": 1795392000000,
    "source": "Yahoo",
    "oiChg": 2.67,
    "oiSource": "CFTC COT أسبوعي (2026-11-17)"
   },
   "ZN": {
-   "price": 106.8438,
-   "chg": 0.91,
-   "date": "2026-11-20",
-   "ts": 1795132800000,
+   "price": 106.4062,
+   "chg": -0.41,
+   "date": "2026-11-23",
+   "ts": 1795392000000,
    "source": "Yahoo",
    "oiChg": 2.5,
    "oiSource": "CFTC COT أسبوعي (2026-11-17)"
@@ -183,48 +183,48 @@
  },
  "sectors": {
   "XLK": {
-   "perf": -7.27,
-   "date": "2026-11-20"
+   "perf": 9.42,
+   "date": "2026-11-23"
   },
   "XLF": {
-   "perf": -1.82,
-   "date": "2026-11-20"
+   "perf": 1.62,
+   "date": "2026-11-23"
   },
   "XLV": {
-   "perf": -0.12,
-   "date": "2026-11-20"
+   "perf": 0.4,
+   "date": "2026-11-23"
   },
   "XLE": {
-   "perf": -0.62,
-   "date": "2026-11-20"
+   "perf": 0.24,
+   "date": "2026-11-23"
   },
   "XLY": {
-   "perf": -2.95,
-   "date": "2026-11-20"
+   "perf": 3.38,
+   "date": "2026-11-23"
   },
   "XLP": {
-   "perf": 0.67,
-   "date": "2026-11-20"
+   "perf": -1.01,
+   "date": "2026-11-23"
   },
   "XLI": {
-   "perf": -3.09,
-   "date": "2026-11-20"
+   "perf": 3.11,
+   "date": "2026-11-23"
   },
   "XLU": {
-   "perf": -0.74,
-   "date": "2026-11-20"
+   "perf": 0.96,
+   "date": "2026-11-23"
   },
   "XLB": {
-   "perf": -2.19,
-   "date": "2026-11-20"
+   "perf": 1.75,
+   "date": "2026-11-23"
   },
   "XLRE": {
-   "perf": -0.98,
-   "date": "2026-11-20"
+   "perf": 1.15,
+   "date": "2026-11-23"
   },
   "XLC": {
-   "perf": -2.66,
-   "date": "2026-11-20"
+   "perf": 3.06,
+   "date": "2026-11-23"
   }
  },
  "recent": [
@@ -350,6 +350,47 @@
     "skew": 138.8,
     "rspSpyChg": 6.97
    }
+  },
+  {
+   "obsKey": "netLiquidity:2026-11-18|repoSofr:2026-11-20|dxy:2026-11-23|hygOas:2026-11-19|yieldCurve:2026-11-20|realYield:2026-11-19",
+   "ts": 1795444344491,
+   "values": {
+    "netLiquidity": 44.6,
+    "repoSofr": 88.7,
+    "dxy": 96.1,
+    "hygOas": 93.8,
+    "yieldCurve": 14.6,
+    "realYield": 98.3,
+    "vix": 96.2,
+    "skewPcr": 16.2,
+    "breadth": 8.5,
+    "crossAsset": 7.2
+   },
+   "prov": {
+    "netLiquidity": 1794960000000,
+    "repoSofr": 1795132800000,
+    "dxy": 1795392000000,
+    "hygOas": 1795046400000,
+    "yieldCurve": 1795132800000,
+    "realYield": 1795046400000,
+    "vix": 1795392000000,
+    "skewPcr": 1795132800000,
+    "breadth": 1795392000000,
+    "crossAsset": 1795305600000
+   },
+   "raw": {
+    "netLiqB": 23,
+    "netLiqLevelB": 5825,
+    "sofrBp": 2.0,
+    "dxy": 104.11,
+    "dxyPct": 96.1,
+    "hygOas": 3.52,
+    "curveBps": 29,
+    "realYield": 2.88,
+    "vix": 27.03,
+    "skew": 138.8,
+    "rspSpyChg": 3.8
+   }
   }
  ],
  "oiHistory": {
@@ -398,6 +439,11 @@
     1795388139845,
     38600.19262,
     "Hyperliquid"
+   ],
+   [
+    1795444344491,
+    36496.52724,
+    "Hyperliquid"
    ]
   ],
   "ETH": [
@@ -444,6 +490,11 @@
    [
     1795388139845,
     616720.2851999997,
+    "Hyperliquid"
+   ],
+   [
+    1795444344491,
+    623316.6264000003,
     "Hyperliquid"
    ]
   ]
