@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated": "2026-11-27T23:09:30Z",
- "generatedTs": 1795820970415,
+ "generated": "2026-11-28T14:15:25Z",
+ "generatedTs": 1795875325111,
  "obsKey": "netLiquidity:2026-11-25|repoSofr:2026-11-25|dxy:2026-11-27|hygOas:2026-11-26|yieldCurve:2026-11-27|realYield:2026-11-25",
  "indicators": {
   "netLiquidity": {
@@ -100,26 +100,26 @@
  },
  "assets": {
   "BTC": {
-   "price": 59790.9,
-   "chg": -1.05,
-   "oiChg": 2.12,
-   "date": "2026-11-27",
-   "ts": 1795820970415,
+   "price": 59154.0,
+   "chg": -3.77,
+   "oiChg": -7.4,
+   "date": "2026-11-28",
+   "ts": 1795875325111,
    "source": "Hyperliquid",
    "oiSource": "Hyperliquid (24h)"
   },
   "ETH": {
-   "price": 1658.1,
-   "chg": -1.74,
-   "oiChg": -11.61,
-   "date": "2026-11-27",
-   "ts": 1795820970415,
+   "price": 1643.9,
+   "chg": -4.62,
+   "oiChg": 1.04,
+   "date": "2026-11-28",
+   "ts": 1795875325111,
    "source": "Hyperliquid",
    "oiSource": "Hyperliquid (24h)"
   },
   "GC": {
-   "price": 3668.5,
-   "chg": 3.75,
+   "price": 3639.6001,
+   "chg": 2.94,
    "date": "2026-11-27",
    "ts": 1795737600000,
    "source": "Yahoo",
@@ -127,8 +127,8 @@
    "oiSource": "CFTC COT أسبوعي (2026-11-17)"
   },
   "SI": {
-   "price": 43.702,
-   "chg": 9.11,
+   "price": 43.167,
+   "chg": 7.78,
    "date": "2026-11-27",
    "ts": 1795737600000,
    "source": "Yahoo",
@@ -145,8 +145,8 @@
    "oiSource": "CFTC COT أسبوعي (2026-11-17)"
   },
   "HG": {
-   "price": 5.6005,
-   "chg": 5.03,
+   "price": 5.517,
+   "chg": 3.46,
    "date": "2026-11-27",
    "ts": 1795737600000,
    "source": "Yahoo",
@@ -172,8 +172,8 @@
    "oiSource": "CFTC COT أسبوعي (2026-11-17)"
   },
   "ZN": {
-   "price": 106.5312,
-   "chg": -0.61,
+   "price": 106.6562,
+   "chg": -0.5,
    "date": "2026-11-27",
    "ts": 1795737600000,
    "source": "Yahoo",
@@ -735,6 +735,11 @@
     1795820970415,
     35240.05962,
     "Hyperliquid"
+   ],
+   [
+    1795875325111,
+    36296.91078,
+    "Hyperliquid"
    ]
   ],
   "ETH": [
@@ -831,6 +836,11 @@
    [
     1795820970415,
     594530.8502,
+    "Hyperliquid"
+   ],
+   [
+    1795875325111,
+    623272.7498,
     "Hyperliquid"
    ]
   ]
